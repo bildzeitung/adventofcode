@@ -10,12 +10,12 @@ def genseq(line):
 
     start = line[0]
     runlength = 1
-    for i in xrange(1, len(line)):
-        if line[i] == start:
+    for i in line[1:]:
+        if i == start:
             runlength += 1
         else:
             result += str(runlength) + start
-            start = line[i]
+            start = i
             runlength = 1
 
     result += str(runlength) + start
