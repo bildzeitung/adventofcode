@@ -1,25 +1,28 @@
 #!/usr/bin/env python
 
-import re
 import sys
 
-FINDER=re.compile(r'(.)\1*')
-
 start = sys.argv[1]
-iters = 50
+iters = int(sys.argv[2])
 
 def genseq(line):
     result = ''
 
-    while line:
-        match = FINDER.match(line)
-        item = match.group()
-        result += str(len(item)) + item[0]
-        line = line[len(item):]
+    start = line[0]
+    runlength = 1
+    for i in xrange(1, len(line)):
+        if line[i] == start:
+            runlength += 1
+        else:
+            result += str(runlength) + start
+            start = line[i]
+            runlength = 1
+
+    result += str(runlength) + start
 
     return result
 
 for i in xrange(iters):
     start = genseq(start)
-    print i, len(start)
+    print i+1, len(start)
 
