@@ -5,6 +5,7 @@ import re
 import sys
 
 DOUBLE = re.compile(r'(.)\1.*(.)\2')
+OPTIMAP = {'i': 'j', 'l': 'm', 'o': 'p'}
 
 password = sys.argv[1]
 
@@ -17,7 +18,11 @@ def advance(item):
     for k, v in reversed_enumerate(litem):
         new_i = ord(v) + 1
         if new_i <= ord('z'):
-            litem[k] = chr(new_i)
+            # check that we haven't hit an illegal char; if so, skip it
+            if chr(new_i) in OPTIMAP:
+                litem[k] = OPTIMAP[chr(new_i)]
+            else:
+                litem[k] = chr(new_i)
             break;
         else:
             litem[k] = 'a'
@@ -48,8 +53,16 @@ def is_ok(item):
 
     return None
 
+# scrub password by finding the first occurrence of a bad character and
+# advancing the string to that point
+bad = re.compile(r'i|l|o')
+match = bad.search(password)
+if match:
+    start = match.start()
+    password = password[:start] + OPTIMAP[password[start]] + ('a' * (len(password[start:])-1))
+else:
+    password = advance(password) 
 
-password = advance(password) 
 while not is_ok(password):
     password = advance(password) 
 
