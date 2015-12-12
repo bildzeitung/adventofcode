@@ -18,6 +18,9 @@ def do_total(data):
         if isinstance(item, list):
             total += do_total(item)
         elif isinstance(item, dict):
+            # drop the dict if any values are 'red'
+            if [x for x in item.values() if isinstance(x, basestring) and x == 'red']:
+                continue
             total += do_total(item)
         elif isinstance(item, basestring):
             continue
