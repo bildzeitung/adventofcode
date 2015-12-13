@@ -20,14 +20,11 @@ with open(sys.argv[1]) as source:
         MASTER[key]['me'] = 0
         MASTER['me'][key] = 0
 
-class AllCombos(object):
-    """ Make an iterator """
-    def __iter__(self):
-        for combo in permutations(MASTER.keys()):
-            table = list(combo)
-            table.append(combo[0])
-            yield sum(MASTER[item1][item2] + MASTER[item2][item1]
-                      for item1, item2 in zip(table, table[1:]))
+def calc(combo):
+    """ Calculate a table """
+    table = list(combo) + [combo[0]]
+    return sum(MASTER[item1][item2] + MASTER[item2][item1]
+               for item1, item2 in zip(table, table[1:]))
 
+print 'BEST: ', max(calc(combo) for combo in permutations(MASTER.keys()))
 
-print 'BEST: ', max(AllCombos())

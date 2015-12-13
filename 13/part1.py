@@ -15,13 +15,10 @@ with open(sys.argv[1]) as source:
         name, oper, amount, name2 = items[0], items[2], items[3], items[-1]
         MASTER[name][name2] = OPS[oper] * int(amount)
 
-class AllCombos(object):
-    """ Make an iterator """
-    def __iter__(self):
-        for combo in permutations(MASTER.keys()):
-            table = list(combo)
-            table.append(combo[0])
-            yield sum(MASTER[item1][item2] + MASTER[item2][item1]
-                      for item1, item2 in zip(table, table[1:]))
+def calc(combo):
+    """ Calculate a table """
+    table = list(combo) + [combo[0]]
+    return sum(MASTER[item1][item2] + MASTER[item2][item1]
+               for item1, item2 in zip(table, table[1:]))
 
-print 'BEST: ', max(AllCombos())
+print 'BEST: ', max(calc(combo) for combo in permutations(MASTER.keys()))
