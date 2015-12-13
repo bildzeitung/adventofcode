@@ -2,7 +2,7 @@
 """ Day 13: part 1 """
 
 from collections import defaultdict
-from itertools import izip, permutations
+from itertools import permutations
 
 import sys
 
@@ -21,10 +21,7 @@ class AllCombos(object):
         for combo in permutations(MASTER.keys()):
             table = list(combo)
             table.append(combo[0])
-            total = 0
-            for item1, item2 in izip(table, table[1:]):
-                total += MASTER[item1][item2] + MASTER[item2][item1]
-
-            yield total
+            yield sum(MASTER[item1][item2] + MASTER[item2][item1]
+                      for item1, item2 in zip(table, table[1:]))
 
 print 'BEST: ', max(AllCombos())
