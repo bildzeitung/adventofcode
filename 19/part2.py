@@ -29,7 +29,7 @@ SORTED_REDUCTIONS = list(sorted(REDUCTIONS,
 RE_REDUCTIONS = list((x, re.compile(x)) for x in SORTED_REDUCTIONS)
 
 def shrink(string):
-    """ Recursive parse tree builder """
+    """ Recursive bottom-up parser """
     print 'Analysing %s' % string
 
     if string == 'e':  # start symbol; finished
