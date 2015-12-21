@@ -7,22 +7,18 @@ from math import ceil
 
 with open('weapons.in') as f:
     WEAPONS = [[int(x) for x in line.rstrip().split(',')[1:]] for line in f]
-print 'W:', WEAPONS
 
 with open('armour.in') as f:
     ARMOUR = [[int(x) for x in line.rstrip().split(',')[1:]] for line in f]
-print 'A:', ARMOUR
 
 with open('rings.in') as f:
     RINGS = [[int(x) for x in line.rstrip().split(',')[1:]] for line in f]
-print 'R:', RINGS
 
 STATS = {}
 with open('boss.in') as f:
     for line in f:
         stat, value = [x.strip() for x in line.split(':')]
         STATS[stat] = int(value)
-print 'S:', STATS
 
 def configurations():
     """ Generate hero inventory """
@@ -36,24 +32,24 @@ def configurations():
                 config.extend(rings)
                 yield config
 
-WINNERS = []
-for config in configurations():
-    cost = sum(x[0] for x in config)
-    attack = sum(x[1] for x in config)
-    defense = sum(x[2] for x in config)
+def get_winners():
+    """ Go through all configurations and return a cost """
+    for config in configurations():
+        cost = sum(x[0] for x in config)
+        attack = sum(x[1] for x in config)
+        defense = sum(x[2] for x in config)
 
-    #print cost, attack, defense
-    net_attack = max(1, attack - STATS['Armor'])
-    boss_attack = max(1, STATS['Damage'] - defense)
+        net_attack = max(1, attack - STATS['Armor'])
+        boss_attack = max(1, STATS['Damage'] - defense)
 
-    turns_to_kill = ceil(STATS['Hit Points'] / float(net_attack))
-    turns_to_live = ceil(100 / float(boss_attack))
+        turns_to_kill = ceil(STATS['Hit Points'] / float(net_attack))
+        turns_to_live = ceil(100 / float(boss_attack))
 
-    if turns_to_live < turns_to_kill:
-        continue
+        if turns_to_live < turns_to_kill:
+            continue
 
-    print 'cost: %s a: %s (%s) def: %s (%s)' % (cost, net_attack, attack, defense, boss_attack)
-    print 'TTK: %s TTL: %s' % (turns_to_kill, turns_to_live)
-    WINNERS.append(cost)
+        print 'cost: %s a: %s (%s) def: %s (%s)' % (cost, net_attack, attack, defense, boss_attack)
+        print 'TTK: %s TTL: %s' % (turns_to_kill, turns_to_live)
+        yield cost
 
-print 'Lowest cost: %s' % min(WINNERS)
+print 'Lowest cost: %s' % min(get_winners())
