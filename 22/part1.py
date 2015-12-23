@@ -12,6 +12,7 @@ with open('boss.in') as infile:
 print 'BOSS: %s' % BOSS
 
 PLAYER = {'Hit Points': 50, 'Mana': 500, 'Armour': 0}
+CURRENT_BEST = float('inf')
 
 """
 Magic Missile costs 53 mana. It instantly does 4 damage.
@@ -33,7 +34,13 @@ SPELLS = {'Magic Missle': {'cost': 53, 'damage': 4, 'heals': 0, 'armour': 0, 'ti
 GAME = {'player': PLAYER, 'boss': BOSS, 'effects':[], 'total': 0}
 
 def turn(state, spell):
-    """ Do a game turn """
+    """ Do a game turn 
+
+        Returns:
+            None - loss or invalid state
+            int - a player win; returns the mana cost
+            dict - a game state; undecided outcome
+    """
     new_effects = []
     boss = copy(state['boss'])
     player = copy(state['player'])
@@ -52,19 +59,27 @@ def turn(state, spell):
         new_effects[-1]['timer'] -= 1
 
     if boss['Hit Points'] < 1:
-        #print 'PLAYER WINS: %s' % state['total']
         return state['total']
 
     # cast something
     for effect in new_effects:
         if effect['timer'] and (spell['cost'] == effect['cost']):
-            # cannot cast this spell
+            # cannot cast this spell (it's already active)
             return
 
     player['Mana'] -= spell['cost']
     player['Armour'] += spell['armour']
+
+    # cannot cast this spell (not enough mana available)
     if player['Mana'] < 0:
-        #print 'RAN OUT OF JUICE'
+        return
+
+    # ok, spell is cast
+    new_total = state['total'] + spell['cost']
+
+    # prune branch if this is now more expensive than the best solution so far
+    # (as it's already worse)
+    if new_total > CURRENT_BEST:
         return
 
     new_effects.append(spell)
@@ -83,36 +98,34 @@ def turn(state, spell):
         newer_effects.append(copy(effect))
         newer_effects[-1]['timer'] -= 1
 
+    # check after effects
     if boss['Hit Points'] < 1:
-        #print '*PLAYER WINS: %s' % (state['total'] + spell['cost'])
-        #print state
-        #print 'PLAYER: %s' % player
-        #print 'BOSS: %s' % boss
-        #print 'EFFECTS: %s' % newer_effects
-        return state['total'] + spell['cost']
+        return new_total
 
+    # boss attack
     player['Hit Points'] -= max(boss['Damage'] - player['Armour'], 1)
 
+    # killing blow by boss?
     if player['Hit Points'] < 1:
         return
 
-    return {'total': state['total'] + spell['cost'],
+    # game isn't over; return game state
+    return {'total': new_total,
             'player': player,
             'boss': boss,
             'effects': newer_effects,
            }
 
+# breadth-first search
 STATES = [GAME]
 RESULTS = []
 while STATES:
-    STATS = len(RESULTS)
-
     STATE = STATES.pop(0)
     NEXT_TURN = [turn(STATE, x) for x in SPELLS.values()]
     RESULTS.extend([x for x in NEXT_TURN if isinstance(x, int)])
     STATES.extend([x for x in NEXT_TURN if isinstance(x, dict)])
 
-    if len(RESULTS) != STATS:
-        print min(RESULTS)
+    if RESULTS:
+        CURRENT_BEST = min(RESULTS)
 
 print 'Final: %s' % min(RESULTS)
