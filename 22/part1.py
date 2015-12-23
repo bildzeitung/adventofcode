@@ -2,6 +2,7 @@
 """ Day 22 """
 
 from copy import copy
+from Queue import PriorityQueue
 
 BOSS = {}
 with open('boss.in') as infile:
@@ -117,15 +118,17 @@ def turn(state, spell):
            }
 
 # breadth-first search
-STATES = [GAME]
-RESULTS = []
-while STATES:
-    STATE = STATES.pop(0)
-    NEXT_TURN = [turn(STATE, x) for x in SPELLS.values()]
-    RESULTS.extend([x for x in NEXT_TURN if isinstance(x, int)])
-    STATES.extend([x for x in NEXT_TURN if isinstance(x, dict)])
+STATES = PriorityQueue()
+STATES.put((0, GAME))
+while not STATES.empty():
+    _, STATE = STATES.get()
 
-    if RESULTS:
-        CURRENT_BEST = min(RESULTS)
+    for spell in SPELLS.values():
+        result = turn(STATE, spell)
 
-print 'Final: %s' % min(RESULTS)
+        if isinstance(result, dict):
+            STATES.put((-result['total'], result))  # order by highest cost
+        elif result:
+            CURRENT_BEST = min(CURRENT_BEST, result)
+
+print 'Final: %s' % CURRENT_BEST
