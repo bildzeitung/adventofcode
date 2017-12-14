@@ -1,0 +1,24 @@
+Solved via inspection
+
+* consider that the input is on the outside of the grid
+* consider that an odd grid size means that the n x n 
+  entry is in the bottom right
+* sort out the Manhattan Distance from where the entry
+  is located
+
+>>> from math import sqrt, ceil
+>>> ceil(sqrt(23))
+5.0
+>>> ceil(sqrt(277678))
+527.0
+>>> 527 ** 2
+277729
+>>> 527 ** 2 - 277678
+51
+>>> 527 /2
+263
+>>> 263-51
+212
+>>> 212+263
+475
+
