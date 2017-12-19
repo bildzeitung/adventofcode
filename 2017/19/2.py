@@ -11,6 +11,13 @@ left = (-1, 0)
 
 
 def walk(puzzle, x, y):
+    ''' Step through the maze
+
+        A '+' is a corner, so change directions there and only there.
+        Run until a space is hit.
+        If a non-space, non-plus character is seen, it's a letter.
+
+    '''
     direction = down  # starting direction
     steps = 0
     max_x = max(len(x) for x in puzzle)
@@ -26,7 +33,7 @@ def walk(puzzle, x, y):
         if puzzle[y][x] == ' ':
             return steps
 
-        if direction == down or direction == up:
+        if direction in (down, up):
             # must switch left or right
             if x+1 < max_x and puzzle[y][x+1] != ' ':
                 direction = right
