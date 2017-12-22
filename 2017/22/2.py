@@ -2,6 +2,7 @@
 '''
     Day 22
 '''
+import time
 import sys
 
 MAX_TICKS = int(sys.argv[1])
@@ -28,6 +29,7 @@ def display(grid, states, pos):
     max_y = max(p[1] for p in grid)
     min_y = min(p[1] for p in grid)
 
+    sys.stderr.write("\x1b[2J\x1b[H")
     print 'Extents: (%s, %s) -> (%s, %s)' % (min_x, min_y, max_x, max_y)
     print 'Pos:', pos
     for y in xrange(min_y - BORDER, max_y + 1 + BORDER):
@@ -49,6 +51,8 @@ def display(grid, states, pos):
             row = ''.join(items)
 
         print row
+
+    time.sleep(0.01)
 
 
 def run(grid, states, pos):
@@ -92,7 +96,7 @@ def main():
     tick = 0
     infections = 0
     while tick < MAX_TICKS:
-        # display(grid, states, pos)
+        display(grid, states, pos)
         pos, did_infect = run(grid, states, pos)
         if did_infect:
             infections += 1
