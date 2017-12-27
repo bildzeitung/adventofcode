@@ -1,0 +1,37 @@
+set b 67        ; start of range
+set c b         ; range is [b, c], but in 'debug' it's [b, b]
+jnz a 2         ; if part 2, then a != 0, so we create an arbitrarily large range
+jnz 1 5         ; skip down to the algorithm if in debug mode
+mul b 100       ; range is now [b * 100, original b]
+sub b -100000   ; range is now [b * 100 + 100K, original b]
+set c b         ; range is now [b * 100 + 100K, b * 100 + 100K]
+sub c -17000    ; range is now [b, b + 17 000]
+set f 1         ; FUNCTION F(b) ; set f <- 0 if b is composite
+set d 2         ; factor
+set e 2         ; counter
+set g d         ; g == accumulator, roughly
+mul g e
+sub g b
+jnz g 2         ; if (d * e) == 0:
+set f 0         ;   then b is composite; unset flag
+sub e -1        ; increment e
+set g e
+sub g b
+jnz g -8        ; loop until e == b [until it's clear that d is or is not a factor of b]
+sub d -1        ; increment d
+set g d
+sub g b
+jnz g -13       ; loop until d == b [check all ints from 2 -> b-1 to see if any are factors]
+jnz f 2         ; has the flag been unset?
+sub h -1        ; if so, then b is composite; count it
+set g b
+sub g c
+jnz g 2         ; are we done? is b == c ?
+jnz 1 3         ; yes, done; terminate
+sub b -17       ; no, increment b by 17 and check if it is composite
+jnz 1 -23       ; call F(b)
+;
+; program looks at a range of integers, as specified up to line 8,
+; and checks if [b, b+17, b+17+17, ... c] are prime. Count up all the
+; composite numbers and store the result in register h
+;
