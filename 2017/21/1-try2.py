@@ -52,6 +52,24 @@ def flip3x3(pattern):
     yield '/'.join([c, b, a])
 
 
+def gen_newgrid(size, grid, ruleset):
+    ''' Given a grid, subdivide it into size x size blocks and apply rules
+
+        The return value is an array of arrays, where the inner array
+        is a row of resolved pattern strings; those can then be
+        recombined from being separate blocks into a single block
+    '''
+    newgrid = []
+    for y in xrange(0, len(grid), size):
+        newrow = []
+        for x in xrange(0, len(grid), size):
+            block = '/'.join([''.join(r[x:x+size]) for r in grid[y:y+size]])
+            newrow.append(ruleset[block])
+        newgrid.append(newrow)
+
+    return newgrid
+
+
 def main():
     ''' Given the fixed starting pattern, run 5 iterations
     '''
@@ -65,7 +83,10 @@ def main():
 
     print 'I read', len(ruleset), 'rules'
 
-    # add all variations in (all rotations + flips + combinations thereof)
+    ''' add all variations in (all rotations + flips + combinations thereof)
+        upshot is that only an O(1) lookup is required for each block, instead
+        of having to rotate / flip each block until it matches a rule
+    '''
     newrules = {}
     for rule, synth in ruleset.iteritems():
         if len(rule) == 5:  # 2x2 rule
@@ -76,7 +97,7 @@ def main():
             for xrule in rotate3x3(rule):
                 newrules[xrule] = synth
 
-            # take each flip, add it, and then rotate it
+            # take each flip, add it, and then add rotations of it
             for xrule in flip3x3(rule):
                 newrules[xrule] = synth
                 for rrule in rotate3x3(xrule):
@@ -96,34 +117,16 @@ def main():
     for item in xrange(int(sys.argv[1])):
         newgrid = []
 
-        # subdivide
+        # subdivide & apply rules
         grid = [list(x) for x in pattern.split('/')]
-        if len(grid) % 2:
-            # odd, so 3x3's
-            for y in xrange(0, len(grid), 3):
-                newrow = []
-                for x in xrange(0, len(grid), 3):
-                    block = '/'.join([''.join(r[x:x+3]) for r in grid[y:y+3]])
-                    newrow.append(ruleset[block])
-                newgrid.append(newrow)
-        else:
-            # even, so 2x2's
-            for y in xrange(0, len(grid), 2):
-                newrow = []
-                for x in xrange(0, len(grid), 2):
-                    block = '/'.join([''.join(r[x:x+2]) for r in grid[y:y+2]])
-                    newrow.append(ruleset[block])
-                newgrid.append(newrow)
+        size = len(grid) % 2 + 2
+        newgrid = gen_newgrid(size, grid, ruleset)
 
-        if len(newgrid) == 1:  # special case
-            pattern = newgrid[0][0]
-        else:
-            # combine results
-            rows = []
-            for y in newgrid:
-                forzip = [i.split('/') for i in y]
-                rows.append('/'.join([''.join(a) for a in izip(*forzip)]))
-            pattern = '/'.join(rows)
+        # combine results
+        pattern = '/'.join(['/'.join([''.join(a)
+                                      for a in izip(*[i.split('/') for i in row])
+                                      ])
+                            for row in newgrid])
 
         print 'AFTER ', item + 1
         print 'HASHES:', Counter(pattern)['#']
