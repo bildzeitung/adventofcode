@@ -1,11 +1,8 @@
 #!/usr/bin/env python
-
+'''
+    Day 23
+'''
 import sys
-
-# initial setting is A <= 7
-registers = {'a': 7, 'b': 0, 'c': 0, 'd': 0}
-pc = 0
-memory = [line.strip() for line in sys.stdin]
 
 
 def _cpy(pc, src, dst):
@@ -80,9 +77,17 @@ def _tgl(pc, reg):
 
 instructions = {'cpy': _cpy, 'inc': _inc, 'dec': _dec, 'jnz': _jnz, 'tgl': _tgl}
 
-while pc < len(memory):
-    # print 'PC', pc, '|', memory[pc], '|', registers
-    op = memory[pc].split()
-    pc = instructions[op[0]](pc, *op[1:])
 
-print registers
+if __name__ == '__main__':
+    with open(sys.argv[1]) as infile:
+        memory = [line.strip() for line in infile]
+
+    # initial setting is A <= 7
+    registers = {'a': 7, 'b': 0, 'c': 0, 'd': 0}
+    pc = 0
+    while pc < len(memory):
+        # print 'PC', pc, '|', memory[pc], '|', registers
+        op = memory[pc].split()
+        pc = instructions[op[0]](pc, *op[1:])
+
+    print registers

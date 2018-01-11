@@ -3,7 +3,8 @@
 import sys
 
 # initial setting is A <= 12
-registers = {'a': 12, 'b': 0, 'c': 0, 'd': 0}
+# registers = {'a': 12, 'b': 0, 'c': 0, 'd': 0}
+registers = {'a': 7, 'b': 0, 'c': 0, 'd': 0}
 pc = 0
 
 with open(sys.argv[1]) as program:
@@ -85,10 +86,10 @@ def _tgl(pc, reg):
 
 def print_program(line):
     for i in range(max(0, line - window), min(len(memory) - 1, line + window)):
-            prefix = ' '
-            if i == pc:
-                prefix = '*'
-            print i, prefix, memory[i]
+        prefix = ' '
+        if i == pc:
+            prefix = '*'
+        print i, prefix, memory[i]
 
 
 instructions = {'cpy': _cpy, 'inc': _inc, 'dec': _dec, 'jnz': _jnz, 'tgl': _tgl}
@@ -122,13 +123,13 @@ while True:
         if not cmd:
             continue
 
-        if cmd[0] == 'q':
+        if cmd[0] == 'q':  # quit
             break
-        elif cmd[0] == 'g':
+        elif cmd[0] == 'g':  # go
             running = True
-        elif cmd[0] == 's':
+        elif cmd[0] == 's':  # step
             run_once = True
-        elif cmd[0] == 'b':
+        elif cmd[0] == 'b':  # show / set breakpoint
             if len(cmd) < 2:
                 print 'Breakpoints:', breakpoints
                 continue
@@ -138,7 +139,7 @@ while True:
             else:
                 breakpoints.append(bp)
             print 'Breakpoints:', breakpoints
-        elif cmd[0] == 'l':
+        elif cmd[0] == 'l':  # list
             print_program(int(cmd[1]))
         else:
             print 'Illegal command:', ' '.join(cmd)
