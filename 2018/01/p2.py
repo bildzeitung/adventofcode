@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from pathlib import Path
 
-seen = {0}
+seen = {0}  # set, primed with 0
 
 
 def get_val(line):
@@ -12,12 +12,20 @@ def get_val(line):
 
 
 def main():
-    total = 0
     p = Path('./input.txt')
+
+    ''' Read the program (all the integers)
+    '''
     items = []
     with p.open() as f:
         items = [get_val(l) for l in f]
 
+    ''' Loop assuming the data will cause it to halt.
+
+        Keep a running total, checking that any given value has not yet been
+        seen. Run through the array repeatedly, as per the problem description
+    '''
+    total = 0
     while (True):
         for item in items:
             total += item
