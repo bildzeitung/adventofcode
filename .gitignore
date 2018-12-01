@@ -58,3 +58,6 @@ target/
 
 # VIM
 *.swp
+
+# Python virtualenv
+venv
