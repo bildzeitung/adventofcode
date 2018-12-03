@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 ''' Day 3
+
+    Brute force mark an array to determine overlaps
+
 '''
 import re
 import sys
@@ -12,6 +15,8 @@ master = []
 
 
 def process_claim(l, t, w, h):
+    ''' Loop through the rectangle and light up squares in the matrix
+    '''
     for i in range(w):
         for j in range(h):
             master[t+j][l+i] += 1
@@ -27,9 +32,8 @@ def main():
                                     for x in CLAIM_RE.search(line).groups()]
             process_claim(from_l, from_t, w, h)
 
-    # for i in range(ARRAY):
-    #     print(''.join([str(x) for x in master[i]]))
-
+    ''' Count the number of elements that have been marked more than one time
+    '''
     print('TOTAL:', sum([sum(x > 1 for x in i) for i in master]))
 
 

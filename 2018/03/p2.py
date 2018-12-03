@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 ''' Day 3
+
+    Brute force mark and evaluate
+
 '''
 import re
 import sys
@@ -29,11 +32,17 @@ def main():
             claims.append((from_l, from_t, w, h))
             process_claim(from_l, from_t, w, h)
 
+    ''' Loop through the claims a second time.
+
+        If the sum of the elements is the same as the area of the
+        rectangle, then there is no overlap
+    '''
     for i, claim in enumerate(claims):
         l, t, w, h = claim
         total = sum(sum(master[t+j][l:l+w]) for j in range(h))
         if total == w * h:
             print("UNTOUCHED:", i+1)
+            break  # done!
 
 
 if __name__ == '__main__':
