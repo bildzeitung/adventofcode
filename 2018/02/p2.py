@@ -1,12 +1,12 @@
 #!/usr/bin/env python
-''' Brute force solution
+""" Brute force solution
 
     Look at all pairs; stop when a solution candidate is found.
 
     The zip / compress business does more work than is strictly
     necessary (stopping after 2nd mismatch is more efficient),
     but is nice and short :)
-'''
+"""
 import sys
 from pathlib import Path
 from itertools import combinations, compress
@@ -29,9 +29,9 @@ def main():
         #
         # zip(a, b) produces [(a[0], b[0]), (a[1], b[1]), ...]
         #
-        x = ''.join(compress(a, [x[0] == x[1] for x in zip(a, b)]))
+        x = "".join(compress(a, [x[0] == x[1] for x in zip(a, b)]))
         if len(x) == target_len:
-            print(a, b, '==>', x)
+            print(a, b, "==>", x)
             break  # Done!
 
 

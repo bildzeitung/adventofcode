@@ -14,8 +14,7 @@ def main():
             total_twos += 2 in c.values()
             total_threes += 3 in c.values()
 
-    print(f"2's: {total_twos}  3's: {total_threes} "
-          f"==> {total_twos * total_threes}")
+    print(f"2's: {total_twos}  3's: {total_threes} " f"==> {total_twos * total_threes}")
 
 
 if __name__ == "__main__":

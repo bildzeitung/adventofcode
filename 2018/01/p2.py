@@ -6,17 +6,17 @@ seen = {0}  # set, primed with 0
 
 
 def main():
-    ''' Read the program (all the integers)
-    '''
+    """ Read the program (all the integers)
+    """
     items = []
-    with Path('./input.txt').open() as f:
+    with Path("./input.txt").open() as f:
         items = [int(l) for l in f]
 
-    ''' Loop assuming the data will cause it to halt.
+    """ Loop assuming the data will cause it to halt.
 
         Keep a running total, checking that any given value has not yet been
         seen. Run through the array repeatedly, as per the problem description
-    '''
+    """
     total = 0
     for item in cycle(items):
         total += item
@@ -26,5 +26,5 @@ def main():
         seen.add(total)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
