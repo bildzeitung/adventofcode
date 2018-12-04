@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 ''' Day 4
+
+    See p1.py for general comments
 '''
 import re
 import sys
@@ -40,6 +42,10 @@ def main():
                               'max': max(minutes)
                               }
 
+    ''' Similar to part 1, but different key.
+
+        In this case, we look at the maximum minutes, not the total
+    '''
     most_sleepy = max(summary, key=lambda k: summary[k]['max'])
     print(summary[most_sleepy]['minutes'])
     most_overlap = max(summary[most_sleepy]['minutes'])
