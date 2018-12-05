@@ -1,6 +1,6 @@
 #!/usr/bin/env python
-''' Day 5
-'''
+""" Day 5
+"""
 import string
 import sys
 from pathlib import Path
@@ -17,7 +17,7 @@ def process(polymer):
 
 
 def react(polymer):
-    while (True):
+    while True:
         current_len = len(polymer)
         polymer = process(polymer)
         if current_len == len(polymer):
@@ -37,11 +37,13 @@ def main():
         replacements.append(f"{lc}{uc}")
 
     polymer = load_polymer()
-    print(min(react(polymer.replace(uc, '').replace(lc, ''))
-              for uc, lc in zip(string.ascii_uppercase, string.ascii_lowercase)
-              )
-          )
+    print(
+        min(
+            react(polymer.replace(uc, "").replace(lc, ""))
+            for uc, lc in zip(string.ascii_uppercase, string.ascii_lowercase)
+        )
+    )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
