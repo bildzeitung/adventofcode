@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 """ Day 5
+
+    Modularize the part 1 solution and call it repeatedly for all
+    cases, a -> z.
 """
 import string
 import sys
