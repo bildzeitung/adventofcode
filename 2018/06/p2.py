@@ -4,7 +4,7 @@
 import sys
 from pathlib import Path
 
-LIMIT = 10_000
+LIMIT = 10000
 
 
 def load_data():
@@ -19,21 +19,21 @@ def in_region(x, y, data):
 def main():
     data = load_data()
 
-    left, right = sorted([*zip(*data)][0])[::len(data)-1]
-    top, bottom = sorted([*zip(*data)][1])[::len(data)-1]
+    left, right = sorted([*zip(*data)][0])[:: len(data) - 1]
+    top, bottom = sorted([*zip(*data)][1])[:: len(data) - 1]
     print(left, top, "->", right, bottom)
 
-    ''' I can't prove this, but I'm going to assume that all points
+    """ I can't prove this, but I'm going to assume that all points
         outside the bounding box will automatically be larger than
         the limit, so there's no need to extend the search area beyond
         the bounding box
-    '''
+    """
     totals = 0
     for y in range(top, bottom + 1):
         for x in range(left, right + 1):
             totals += in_region(x, y, data)
 
-    print('TOTALS', totals)
+    print("TOTALS", totals)
 
 
 if __name__ == "__main__":
