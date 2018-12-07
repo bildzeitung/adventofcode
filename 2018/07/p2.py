@@ -1,6 +1,6 @@
 #!/usr/bin/env python
-''' Day 7
-'''
+""" Day 7
+"""
 import re
 import sys
 from collections import defaultdict
@@ -10,7 +10,7 @@ BASE_TIME = 60  # base + offset (A == 1, B == 2, ...)
 WORKERS = 5  # total number of workers
 
 # Step Q must be finished before step I can begin.
-DATA = re.compile(r'Step (.) must be finished before step (.) can begin')
+DATA = re.compile(r"Step (.) must be finished before step (.) can begin")
 
 
 def load_data():
@@ -32,7 +32,16 @@ def get_next(data):
     item = item[0]
     del data[item]
 
-    return item, BASE_TIME + ord(item) - ord('A') + 1
+    return item, BASE_TIME + ord(item) - ord("A") + 1
+
+
+def remove_item(data, item):
+    for v in data.values():
+        try:
+            i = v.index(item)
+        except ValueError:
+            continue
+        del v[i]
 
 
 def main():
@@ -54,18 +63,13 @@ def main():
             # if work was assigned, and the timer ran out, then
             # remove the work item from dependency lists
             if workers[i][1] == 0 and w[0]:
-                for _, v in data.items():
-                    try:
-                        i = v.index(w[0])
-                    except ValueError:
-                        continue
-                    del v[i]
+                remove_item(data, w[0])
 
     # final adjustment
     time += max(w[1] for w in workers)
 
-    print('TIME', time)
+    print("TIME", time)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
