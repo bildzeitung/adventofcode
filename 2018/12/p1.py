@@ -16,7 +16,7 @@ def load_data():
     with Path(sys.argv[1]).open() as f:
         initial = f.readline().split(':')[1].strip()
         f.readline()  # blank line
-        rules = {rule[0].strip(): rule[1].strip()
+        rules = {tuple(rule[0].strip()): rule[1].strip()
                  for rule in
                  [line.split('=>') for line in f]
                  }
@@ -40,7 +40,7 @@ def main():
             initial = ['.', '.', '.', '.', *initial]
             offset += -4
         if not all(x == '.' for x in initial[-4:]):
-            initial.extend(['.', '.', '.', '.'])
+            initial.extend(['.'] * 4)
 
         nextgen = ['.'] * len(initial)
 
@@ -57,8 +57,9 @@ def main():
         '''
         for idx, c in enumerate(zip(*[initial[j:] for j in range(5)])):
             try:
-                nextgen[idx+2] = rules[''.join(c)]
-            except KeyError:
+                # nextgen[idx+2] = rules[''.join(c)]
+                nextgen[idx+2] = rules[c]
+            except KeyError:  # only needed for test data
                 nextgen[idx+2] = '.'
         initial = nextgen
 
