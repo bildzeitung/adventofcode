@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """ Day 12
-    
+
     1D-cellular automaton with a 2 cell window
 """
 import sys
@@ -17,6 +17,7 @@ def load_data():
         initial = f.readline().split(":")[1].strip()
         f.readline()  # blank line
         rules = {
+            # e.g. (".", ".", ".", "#", "#"): "#"
             tuple(rule[0].strip()): rule[1].strip()
             for rule in [line.split("=>") for line in f]
         }
