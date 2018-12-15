@@ -24,11 +24,12 @@ def main():
         # check only once in a while
         if not (i % LIMIT) and i:
             print(i)
-            recipe_string += ''.join(str(x) for x in recipes[oldi:])
+            recipe_string = recipe_string[len(recipe_string) -
+                                          len(to_make):] + \
+                ''.join(str(x) for x in recipes[oldi:])
             f = recipe_string.find(to_make)
             if f != -1:
-                print('DONE:', f)
-                # print(recipe_string)
+                print('DONE:', f + oldi - len(to_make))
                 return
             oldi = len(recipes)
 
