@@ -77,9 +77,6 @@ class Game:
             self.board[target.pos[1]][target.pos[0]] = '.'
 
     def unit_turn(self, unit):
-        if not unit.is_alive:
-            return True
-
         targets = self.unit_by_kind(unit.enemy_kind)
 
         # check that an enemy unit exists; if not, game ends
@@ -97,13 +94,9 @@ class Game:
             for pos in points:
                 if unit.pos == pos or self.is_in_range(*pos):
                     in_range.append(pos)
-                    # self.board[pos[1]][pos[0]] = '?'
 
         if not in_range:
-            # print('Unit', unit.pos, 'HAS NOTHING IN RANGE')
             return True
-        # print('IN RANGE', in_range)
-        # self.show()
 
         if unit.pos in in_range:
             self.attack(unit)
@@ -193,6 +186,9 @@ class Game:
     def turn(self):
         not_done = True
         for unit in sorted(self.units, key=lambda x: (x.pos[1], x.pos[0])):
+            if not unit.is_alive:
+                continue
+
             if not self.unit_turn(unit):
                 not_done = False
                 break
