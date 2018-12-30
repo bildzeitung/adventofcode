@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 '''
-    Day 16
+    Day 16: Calculate ambiguous cases
+
+    In this part, the VM is implemented and some simple counting happens
 '''
 import sys
 from pathlib import Path
