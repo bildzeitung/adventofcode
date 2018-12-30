@@ -1,6 +1,16 @@
 #!/usr/bin/env python
 '''
-    Day 16
+    Day 16: Derive instructions from test cases
+
+    Instead of manually figuring this out, or by incrementally building up
+    something by hand, assume the data set is marginally polite and presents
+    unambiguous mappings that can be auto-determined.
+
+    Loop through test cases looking for unambiguous cases. Eliminate opcodes
+    that are well-defined, and loop again until all opcodes are identified.
+
+    This assumes that once known instructions are removed from ambiguous cases
+    that there are more well-defined cases. Fortunately, this holds :)
 '''
 import sys
 from pathlib import Path
@@ -115,30 +125,37 @@ def main():
             instr = [int(x) for x in instr.strip().split(' ')]
             test_cases.append((instr, before_line, after_line))
 
+    # these are the instructions that need to be evaluated
     instr_to_validate = [x for x in range(len(Machine().opcodes))]
 
+    final = [''] * 16
     while instr_to_validate:
         results = set()
-        to_remove = []
         for t in test_cases:
             instr, before, after = t
             rv = process(instr_to_validate, instr, before, after)
+            #
+            # look for results where there is exactly one instruction;
+            # that instruction is now precisely determined, and can be washed
+            # out of cases where it is ambiguous
+            #
             if sum(rv) == 1:
+                # find the True value, map it against the list of opcode
+                # indices under test
                 good_instr = instr_to_validate[rv.index(1)]
-                results.add((Machine().opcodes[good_instr], good_instr, instr[0]))
-                to_remove.append(t)
+                results.add((Machine().opcodes[good_instr],
+                             good_instr,
+                             instr[0]))
 
-        print('R', results)
+        for r in results:
+            final[r[2]] = r[0]
+
+        # any instructions that have been identified should not be run again
         for _, x, _ in results:
             instr_to_validate.remove(x)
 
-        # print('STARTED WITH', len(test_cases))
-        # for x in to_remove:
-        #     test_cases.remove(x)
-        # print('ENDED WITH', len(test_cases))
-
-        # print('I', instr_to_validate)
-
+    print('FINAL MAPPING, IN ORDER')
+    print('\n'.join(final))
 
 
 if __name__ == '__main__':
