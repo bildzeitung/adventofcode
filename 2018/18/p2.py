@@ -20,16 +20,11 @@ def around(area, y, x):
 
 
 def check_open(area, y, x):
-    total = sum(t == '|' for t in around(area, y, x))
-    return '|' if total > 2 else '.'
+    return '|' if sum(t == '|' for t in around(area, y, x)) > 2 else '.'
 
 
 def check_trees(area, y, x):
-    total = 0
-    for t in around(area, y, x):
-        total += t == '#'
-
-    return '#' if total > 2 else '|'
+    return '#' if sum(t == '#' for t in around(area, y, x)) > 2 else '|'
 
 
 def check_lumber(area, y, x):
