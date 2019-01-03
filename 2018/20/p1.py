@@ -1,6 +1,13 @@
 #!/usr/bin/env python
 '''
     Day 20: REGEX
+
+    ** both parts in this one file, since there's no logic change
+
+    A two-part solution:
+        (a) build the maze
+        (b) solve the maze
+
 '''
 import sys
 from pathlib import Path
@@ -34,6 +41,11 @@ def display(base, p=START):
 
 
 def run(regex):
+    ''' Generate the maze
+
+        Work through the regex, using a stack to handle the ( .. | .. )
+        alternations
+    '''
     stack = []
     pos = START
     base = {  # initial starting configuration, completely drawn
@@ -49,32 +61,33 @@ def run(regex):
             }
     # display(base)
     for c in regex:
-        x = pos[0]
-        y = pos[1]
-        if c in '^$':
+        if c in '^$':  # ignore; not needed
             continue
-        if c in 'NEWS':
-            p = (x + DM[c][0], y + DM[c][1])
-            base[p] = DMC[c]
+        if c in 'NEWS':  # if it's a direction, then walk
+            p = (pos[0] + DM[c][0], pos[1] + DM[c][1])
+            base[p] = DMC[c]  # draw a door; n.b. this will overwrite an '?'
             pos = (p[0] + DM[c][0], p[1] + DM[c][1])
-            base[pos] = '.'
-            for i in 'NEWS':
+            base[pos] = '.'  # draw the room
+            for i in 'NEWS':  # draw unknown exits
                 p = (pos[0] + DM[i][0], pos[1] + DM[i][1])
                 if p not in base:
                     base[p] = '?'
+            # draw walls around the current room
             base[(pos[0] - 1, pos[1] - 1)] = '#'
             base[(pos[0] + 1, pos[1] - 1)] = '#'
             base[(pos[0] - 1, pos[1] + 1)] = '#'
             base[(pos[0] + 1, pos[1] + 1)] = '#'
             # display(base, pos)
-        if c == '(':  # open capture
+        if c == '(':  # open capture; push the current position
             stack.append(pos)
-        if c == ')':  # close capture
+        if c == ')':  # close capture; restore the last saved position and pop
             pos = stack.pop()
-        if c == '|':  # alternation
+        if c == '|':    # alternation; restore the saved position, but peek
+                        # (since other options will need to start from the
+                        # capture open point)
             pos = stack[-1]
 
-    # change ? -> #
+    # base is defined; all ? are presumed to be walls
     for k, v in base.items():
         if v == '?':
             base[k] = '#'
@@ -85,6 +98,10 @@ def run(regex):
 
 
 def find_path(base):
+    ''' Use a breadth-first search to determine shortest paths
+
+        Save the longest path, and count any rooms whose path is >=1k rooms
+    '''
     oset = [(START, 0)]
     seen = set()
     maxpath = 0
@@ -99,9 +116,9 @@ def find_path(base):
         for i in 'NEWS':
             n = (p[0] + DM[i][0], p[1] + DM[i][1])
             nn = (n[0] + DM[i][0], n[1] + DM[i][1])
-            if nn in seen:
+            if nn in seen:  # in other words, exclude door walked through last
                 continue
-            if base[n] in '|-':
+            if base[n] in '|-':  # next room!
                 oset.append(
                         ((n[0] + DM[i][0], n[1] + DM[i][1]), pathlength + 1)
                         )
