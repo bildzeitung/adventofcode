@@ -1,4 +1,11 @@
 #!/usr/bin/env python
+'''
+    Day 21: VM again!
+
+    Translate the key portion of the code into Python
+    instead of the Elf VM. Roll-up the time consuming loop
+    to save a little time
+'''
 
 
 def main():
@@ -15,10 +22,14 @@ def main():
                 vals.append(r3)
             else:
                 print(vals)
-                # puzzle answer is the last one in the sequence
+                '''
+                  Puzzle answer is the last one in the sequence.
+                  Any other value for register 3 appears earlier
+                  in the sequence, and therefore would use fewer
+                  instructions.
+                '''
                 print("FINAL", vals[-1])
                 return
-            # printf("%ld\n", r3)
             r4 = r3 | 65536
             r3 = 10649702
         else:
