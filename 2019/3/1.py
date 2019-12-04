@@ -6,36 +6,28 @@ import sys
 from itertools import repeat
 from pathlib import Path
 
-dirs = {"R": (1, 0),
-        "L": (-1, 0),
-        "U": (0, 1),
-        "D": (0, -1)}
+dirs = {"R": (1, 0), "L": (-1, 0), "U": (0, 1), "D": (0, -1)}
 
 
 def main():
     with Path(sys.argv[1]).open() as f:
-        path1 = [
-            repeat(dirs[x[0]], int(x[1:])) 
-            for x in f.readline().strip().split(",")
-            ]
-        path2 = [
-            repeat(dirs[x[0]], int(x[1:])) 
-            for x in f.readline().strip().split(",")
+
+        def readpath():
+            return [
+                repeat(dirs[x[0]], int(x[1:])) for x in f.readline().strip().split(",")
             ]
 
-    s = (0, 0)
-    e1 = set()
-    for i in path1:
-        for x in i:
-            s = (s[0]+x[0], s[1]+x[1])
-            e1.add(s)
+        def drawpath(points):
+            s = (0, 0)
+            e = set()
+            for i in points:
+                for x in i:
+                    s = (s[0] + x[0], s[1] + x[1])
+                    e.add(s)
+            return e
 
-    s = (0, 0)
-    e2 = set()
-    for i in path2:
-        for x in i:
-            s = (s[0]+x[0], s[1]+x[1])
-            e2.add(s)
+        e1 = drawpath(readpath())
+        e2 = drawpath(readpath())
 
     m = [abs(x[0]) + abs(x[1]) for x in e1 & e2]
     print(min(m))

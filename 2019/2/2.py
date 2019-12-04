@@ -3,13 +3,12 @@
 """
 import sys
 
-from copy import copy
 from pathlib import Path
 
 
 class Apollo:
     def __init__(self, code):
-        self.code = copy(code)
+        self.code = code[:]
 
     def run(self):
         pc = 0
