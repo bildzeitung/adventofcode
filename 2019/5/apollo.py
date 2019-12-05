@@ -26,7 +26,7 @@ class Apollo:
 
         # print("decoding:", to_decode, vals)
 
-        return reversed(vals)
+        return vals
 
     def run(self):
         while True:
@@ -48,6 +48,32 @@ class Apollo:
             elif instr == 4:  # OUT
                 print("OUT:", *self.args(1))
                 self.pc += 2
+            elif instr == 5:  # JMP-IF-TRUE
+                tst, target = self.args(2)
+                if tst:
+                    self.pc = target
+                else:
+                    self.pc += 3
+            elif instr == 6:  # JMP-IF-FALSE
+                tst, target = self.args(2)
+                if not tst:
+                    self.pc = target
+                else:
+                    self.pc += 3
+            elif instr == 7:  # LT
+                arg0, arg1 = self.args(2)
+                if arg0 < arg1:
+                    self.code[self.code[self.pc + 3]] = 1
+                else:
+                    self.code[self.code[self.pc + 3]] = 0
+                self.pc += 4
+            elif instr == 8:  # EQ
+                arg0, arg1 = self.args(2)
+                if arg0 == arg1:
+                    self.code[self.code[self.pc + 3]] = 1
+                else:
+                    self.code[self.code[self.pc + 3]] = 0
+                self.pc += 4
             else:
                 raise Exception(f"Dirty computer: {instr}")
 
