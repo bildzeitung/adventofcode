@@ -4,22 +4,27 @@
 
 
 class Apollo:
-    def __init__(self, code, input_buffer):
+    WAIT = "WAIT"
+    HALT = "HALT"
+    
+    def __init__(self, name, code, input_buffer):
+        self.name = name
         self.code = code[:]
-        self.pc = 0
         self._input_buffer = input_buffer
-        self._output_buffer = []
+        self.pc = 0
+        self.state = self.WAIT
+        self.output = None
+        self._last_output = None
 
     @property
-    def input_buffer(self):
+    def input(self):
         if self._input_buffer:
             return self._input_buffer.pop(0)
-        else:
-            return int(input("> "))
 
-    @property
-    def output_buffer(self):
-        return self._output_buffer.pop(0)
+        return None
+
+    def send(self, val):
+        self._input_buffer.append(val)
 
     @property
     def instr(self):
@@ -37,8 +42,6 @@ class Apollo:
                 # position
                 vals.append(self.code[self.code[idx]])
 
-        # print("decoding:", to_decode, vals)
-
         return vals
 
     def run(self):
@@ -46,6 +49,7 @@ class Apollo:
             instr = self.instr
 
             if instr == 99:  # HALT
+                self.state = self.HALT
                 break
             if instr == 1:  # ADD
                 arg0, arg1 = self.args(2)
@@ -56,10 +60,15 @@ class Apollo:
                 self.code[self.code[self.pc + 3]] = arg0 * arg1
                 self.pc += 4
             elif instr == 3:  # IN
-                self.code[self.code[self.pc + 1]] = self.input_buffer
+                from_input = self.input
+                if from_input is None:  # need to wait for input
+                    break
+                self.code[self.code[self.pc + 1]] = from_input
                 self.pc += 2
             elif instr == 4:  # OUT
-                self._output_buffer.append(self.args(1)[0])
+                val = self.args(1)[0]
+                self.output.send(val)
+                self._last_output = val
                 self.pc += 2
             elif instr == 5:  # JMP-IF-TRUE
                 tst, target = self.args(2)
