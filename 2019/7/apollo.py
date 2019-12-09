@@ -6,7 +6,7 @@
 class Apollo:
     WAIT = "WAIT"
     HALT = "HALT"
-    
+
     def __init__(self, name, code, input_buffer):
         self.name = name
         self.code = code[:]
@@ -37,10 +37,10 @@ class Apollo:
             idx = self.pc + i + 1
             if (to_decode // (10 ** i)) % 10:
                 # immediate
-                vals.append(self.code[idx])
+                vals.append(idx)
             else:
                 # position
-                vals.append(self.code[self.code[idx]])
+                vals.append(self.code[idx])
 
         return vals
 
@@ -52,49 +52,49 @@ class Apollo:
                 self.state = self.HALT
                 break
             if instr == 1:  # ADD
-                arg0, arg1 = self.args(2)
-                self.code[self.code[self.pc + 3]] = arg0 + arg1
+                arg0, arg1, dst = self.args(3)
+                self.code[dst] = self.code[arg0] + self.code[arg1]
                 self.pc += 4
             elif instr == 2:  # MUL
-                arg0, arg1 = self.args(2)
-                self.code[self.code[self.pc + 3]] = arg0 * arg1
+                arg0, arg1, dst = self.args(3)
+                self.code[dst] = self.code[arg0] * self.code[arg1]
                 self.pc += 4
             elif instr == 3:  # IN
                 from_input = self.input
                 if from_input is None:  # need to wait for input
                     break
-                self.code[self.code[self.pc + 1]] = from_input
+                self.code[self.args(1)[0]] = from_input
                 self.pc += 2
             elif instr == 4:  # OUT
-                val = self.args(1)[0]
+                val = self.code[self.args(1)[0]]
                 self.output.send(val)
                 self._last_output = val
                 self.pc += 2
             elif instr == 5:  # JMP-IF-TRUE
                 tst, target = self.args(2)
-                if tst:
-                    self.pc = target
+                if self.code[tst]:
+                    self.pc = self.code[target]
                 else:
                     self.pc += 3
             elif instr == 6:  # JMP-IF-FALSE
                 tst, target = self.args(2)
-                if not tst:
-                    self.pc = target
+                if not self.code[tst]:
+                    self.pc = self.code[target]
                 else:
                     self.pc += 3
             elif instr == 7:  # LT
-                arg0, arg1 = self.args(2)
-                if arg0 < arg1:
-                    self.code[self.code[self.pc + 3]] = 1
+                arg0, arg1, dst = self.args(3)
+                if self.code[arg0] < self.code[arg1]:
+                    self.code[dst] = 1
                 else:
-                    self.code[self.code[self.pc + 3]] = 0
+                    self.code[dst] = 0
                 self.pc += 4
             elif instr == 8:  # EQ
-                arg0, arg1 = self.args(2)
-                if arg0 == arg1:
-                    self.code[self.code[self.pc + 3]] = 1
+                arg0, arg1, dst = self.args(3)
+                if self.code[arg0] == self.code[arg1]:
+                    self.code[dst] = 1
                 else:
-                    self.code[self.code[self.pc + 3]] = 0
+                    self.code[dst] = 0
                 self.pc += 4
             else:
                 raise Exception(f"Dirty computer: {instr}")
