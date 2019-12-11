@@ -13,22 +13,22 @@ class InputOutputProvider:
     COLOUR = True
     DIRS = [(0, -1), (1, 0), (0, 1), (-1, 0)]
 
-    def draw(self):
-        min_x = min(x[0] for x in self._canvas)
-        min_y = min(x[1] for x in self._canvas)
-        max_x = max(x[0] for x in self._canvas)
-        max_y = max(x[1] for x in self._canvas)
-        chars = {0: " ", 1: "."}
-        print(min_x, min_y, max_x, max_y)
-        for y in range(min_y, max_y + 1):
-            print("".join(chars[self._canvas[(x, y)]] for x in range(min_x, max_x + 1)))
-
     def __init__(self):
         self._pos = (0, 0)
         self._canvas = defaultdict(int)
         self._accept = self.COLOUR
         self._dir = 0  # up
         self._didpaint = set()
+
+    def draw(self):
+        min_x = min(x[0] for x in self._canvas)
+        min_y = min(x[1] for x in self._canvas)
+        max_x = max(x[0] for x in self._canvas)
+        max_y = max(x[1] for x in self._canvas)
+        chars = {0: " ", 1: "."}
+        # print(min_x, min_y, max_x, max_y)
+        for y in range(min_y, max_y + 1):
+            print("".join(chars[self._canvas[(x, y)]] for x in range(min_x, max_x + 1)))
 
     def set_start(self, val):
         self._canvas[(0, 0)] = val
