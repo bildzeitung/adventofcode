@@ -28,16 +28,12 @@ class Apollo:
     def send(self, val):
         self._input_buffer.append(val)
 
-    @property
-    def instr(self):
-        return self.code[self.pc] % 100
-
     def args(self, n):
         to_decode = self.code[self.pc] // 100
         vals = []
+        idx = self.pc + 1
         for i in range(n):
-            idx = self.pc + i + 1
-            mode = (to_decode // (10 ** i)) % 10
+            mode = to_decode % 10
             if mode == 1:
                 # immediate
                 vals.append(idx)
@@ -47,12 +43,24 @@ class Apollo:
             else:
                 # position
                 vals.append(self.code[idx])
+            to_decode //= 10
+            idx += 1
 
         return vals
 
+    def single_arg(self):
+        mode = (self.code[self.pc] // 100) % 10
+        idx = self.pc + 1
+        if mode == 1:
+            return idx
+        elif mode == 2:
+            return self._relative_base + self.code[idx]
+
+        return self.code[idx]
+
     def run(self):
         while True:
-            instr = self.instr
+            instr = self.code[self.pc] % 100
 
             if instr == 99:  # HALT
                 self.state = self.HALT
@@ -66,14 +74,14 @@ class Apollo:
                 self.code[dst] = self.code[arg0] * self.code[arg1]
                 self.pc += 4
             elif instr == 3:  # IN
-                dst = self.args(1)[0]
+                dst = self.single_arg()
                 from_input = self.input
                 if from_input is None:  # need to wait for input
                     break
                 self.code[dst] = from_input
                 self.pc += 2
             elif instr == 4:  # OUT
-                val = self.code[self.args(1)[0]]
+                val = self.code[self.single_arg()]
                 self.output.send(val)
                 self._last_output = val
                 self.pc += 2
@@ -104,7 +112,7 @@ class Apollo:
                     self.code[dst] = 0
                 self.pc += 4
             elif instr == 9:  # ADJ-RELBASE
-                self._relative_base += self.code[self.args(1)[0]]
+                self._relative_base += self.code[self.single_arg()]
                 self.pc += 2
             else:
                 raise Exception(f"Dirty computer: {instr}")

@@ -30,7 +30,6 @@ class InputOutputProvider:
         print(self.ball, self.paddle, self.score, "\033[K")
 
     def pop(self, _):
-        self.draw()
         # super basic AI -- position paddle under ball
         if self.ball[0] > self.paddle[0]:
             return 1
