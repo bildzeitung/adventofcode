@@ -18,6 +18,13 @@ class FinishedException(Exception):
 
 
 class InputOutputProvider:
+    """ Run the robot around the entire maze
+
+        If we break once the oxygen is found, we have no guarantee that we
+        have the shortest path. Since Part 2 needs a complete map anyway,
+        build it up and then use the data to answer the questions.
+    """
+
     MOVES = [0, 1, 2, 3]  # N, S, W, E
     MOVEDIR = [(0, -1), (0, 1), (-1, 0), (1, 0)]
     OPPOSITE = [1, 0, 3, 2]
@@ -59,60 +66,80 @@ class InputOutputProvider:
         print(f"Queue: {len(self._moves)}")
 
     def pop(self, _):
+        """ Robot looking for input
+
+            Algorithm is to keep a stack of directions robot came from (so that
+            it can back up) and a list of directions to try to move.
+        """
         move = self._moves[-1]
-        while len(move["to-try"]):
+        while len(move["to-try"]):  # is there a direction to try?
             direction = move["to-try"].pop(0)
             move_adj = self.MOVEDIR[direction]
             new_pos = (self._pos[0] + move_adj[0], self._pos[1] + move_adj[1])
             if self._canvas[new_pos] != " ":
                 continue  # don't go where we've been
+            # record direction given
             self._last_move = direction
             return self._last_move + 1
 
         # no more moves left; need to backtrack
-        self._moves.pop()  # remove move from the stack
+        self._moves.pop()  # remove node from the stack
+        # ugly hack to stop the VM, but it works
         if move["move"] is None:
             raise FinishedException(f"We're done here: {self._pos} {len(self._moves)}")
+        # set a backgrack flag and move the opposite direction from where
+        # went to get to the current position
         self._last_move = self.OPPOSITE[move["move"]]
         self._backtrack = True
         return self._last_move + 1
 
     def send(self, val):
+        """ Receive result of the move command
+        """
         move_adj = self.MOVEDIR[self._last_move]
         new_pos = (self._pos[0] + move_adj[0], self._pos[1] + move_adj[1])
-        if val == 0:  # wall
+        if val == 0:  # hit wall; record wall position
             self._canvas[new_pos] = WALL
         else:  # move ok, or oxygen
             self._pos = new_pos
             if not self._backtrack:
-                if val == 2:
+                if val == 2:  # aka, oxygen; record it
                     self._canvas[self._pos] = "O"
                     self._oxygen = new_pos
                 else:
                     self._canvas[self._pos] = HALL
+                # need to push a new node onto the stack
                 self._moves.append(
                     {
                         "move": self._last_move,
                         "to-try": [
-                            x for x in self.MOVES if x != self.OPPOSITE[self._last_move]
+                            # try all directions *except* the one that backtracks
+                            x
+                            for x in self.MOVES
+                            if x != self.OPPOSITE[self._last_move]
                         ],
                     }
                 )
             else:
+                # on a backtrack, the node is gone and no other bookkeeping is
+                # needed; reset the flag and resume until more input is needed
                 self._backtrack = False
 
         self.draw()
 
 
 def solve(canvas):
+    """ Breadth-first tree search from start -> oxygen
+    """
     MOVEDIR = [(0, -1), (0, 1), (-1, 0), (1, 0)]
+    # (path length, co-ordinate)
     q = [(0, (0, 0))]
     seen = []
     while q:
         l, n = q.pop()
         seen.append(n)
         if canvas[n] == "O":
-            return l
+            return l  # found it!
         l += 1
         for d in MOVEDIR:
             new_n = (n[0] + d[0], n[1] + d[1])
