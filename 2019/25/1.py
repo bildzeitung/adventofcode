@@ -1,11 +1,7 @@
 #!/usr/bin/env python
-""" 
+"""
     Day 25
 """
-import sys
-from time import sleep
-from collections import defaultdict
-from itertools import product
 from pathlib import Path
 
 from apollo import Apollo
@@ -18,6 +14,10 @@ class InputOutputProvider:
         self._outbuffer = []
 
     def pop(self, _):
+        """ Feed in the script, line-by-line
+            Then accept user input.
+            Use a buffer to feed individual characters to the VM
+        """
         if not self._buffer:
             if self._script:
                 self._buffer = list(self._script.pop(0))
@@ -28,6 +28,8 @@ class InputOutputProvider:
         return ord(self._buffer.pop(0))
 
     def send(self, val):
+        """ Line-base output; buffer until a newline
+        """
         if val != ord("\n"):
             self._outbuffer.append(chr(val))
         else:
@@ -39,6 +41,7 @@ def main():
     with Path("input.txt").open() as f:
         code = [int(x) for x in f.read().strip().split(",")]
 
+    # solution script, because lazy
     with Path("script.txt").open() as f:
         script = f.readlines()
 
