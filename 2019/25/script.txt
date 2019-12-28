@@ -1,0 +1,22 @@
+west
+north
+east
+east
+west
+take space law space brochure
+west
+take space heater
+south
+take hologram
+east
+east
+east
+east
+take spool of cat6
+west
+west
+south
+east
+east
+east
+south
