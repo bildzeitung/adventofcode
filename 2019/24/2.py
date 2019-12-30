@@ -58,18 +58,17 @@ def step(grids, idx):
             if row == 3 and col == 2:
                 continue
 
-            v = sum(
-                [
-                    mget(row - 1, col),
-                    mget(row, col - 1),
-                    mget(row, col + 1),
-                    mget(row + 1, col),
-                ]
+            v = (
+                mget(row - 1, col)
+                + mget(row, col - 1)
+                + mget(row, col + 1)
+                + mget(row + 1, col)
             )
             g[row][col] = get_state(grids[idx][row][col], v)
-            # if idx > 0:
-            #    print(f"{row}, {col} -> {v} [{grids[idx][row][col]}]")
-    # draw(g)
+
+    # handle special cases ignored above; all these ref the next grid down
+    # (and since it depends on which grid space is asking, it's not the
+    #  same as an out-of-bounds issue, which is what mget() sorts out)
     v = grids[idx][0][2] + grids[idx][1][1] + grids[idx][1][3]
     if (idx + 1) < len(grids):
         v += sum(grids[idx + 1][0])
@@ -124,10 +123,12 @@ def main():
 
     grids = [grid]
     for i in range(200):
+        # add new grids if needed
         if calc(grids[0]):
             grids.insert(0, newgrid())
         if calc(grids[-1]):
             grids.append(newgrid())
+        # calculate next generation
         grids = [step(grids, g) for g in range(len(grids))]
         # for g in grids:
         #    draw(g)
