@@ -17,6 +17,8 @@ class Apollo:
         self.output = None
         self._last_output = None
         self._relative_base = 0
+        self._loop_detect = [None, None, None, None, None, None]
+        self._is_in_loop = False
 
     @property
     def input(self):
@@ -56,8 +58,23 @@ class Apollo:
         while True:
             self.step()
 
+    @property
+    def is_loop(self):
+        if self._loop_detect == [3, 8, 6, 6, 6, 3] and not self._is_in_loop:
+            self._is_in_loop = True
+            print(f"[{self.name}] in loop")
+        return self._is_in_loop
+
+    def reset(self):
+        self._is_in_loop = False
+
+    def ld(self, instr):
+        self._loop_detect.pop(0)
+        self._loop_detect.append(instr)
+
     def step(self):
         instr = self.code[self.pc] % 100
+        self.ld(instr)
 
         if instr == 99:  # HALT
             self.state = self.HALT
