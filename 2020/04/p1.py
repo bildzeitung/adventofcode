@@ -4,6 +4,7 @@
 """
 import sys
 
+# all of the fields required to be in the passport
 FIELDS = set(
     [
         "byr",  # (Birth Year)
@@ -22,10 +23,12 @@ def read_passport(f):
     passport = {}
     while l := f.readline():
         l = l.strip()
-        if not l:
-            return passport
+        if not l:  # blank line separating passports
+            yield passport
+            passport = {}
+            continue
         passport.update(dict(entry.split(":") for entry in l.split(" ")))
-    return passport
+    yield passport
 
 
 def is_valid(passport):
@@ -37,12 +40,7 @@ def is_valid(passport):
 
 def main():
     with open(sys.argv[1]) as f:
-
-        def feed():
-            while passport := read_passport(f):
-                yield is_valid(passport)
-
-        return sum(x for x in feed())
+        return sum(is_valid(x) for x in read_passport(f))
 
 
 if __name__ == "__main__":
