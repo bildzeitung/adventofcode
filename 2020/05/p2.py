@@ -5,23 +5,10 @@
 import sys
 
 
-def getrow(bsp):
-    left = 0
-    right = 127
+def narrow(bsp, rb):
+    left, right = 0, rb
     for k in bsp:
-        if k == "F":
-            right = (right - left) / 2 + left
-        else:
-            left = (right - left + 1) / 2 + left
-    assert left == right
-    return left
-
-
-def getcol(bsp):
-    left = 0
-    right = 7
-    for k in bsp:
-        if k == "L":
+        if k == "F" or k == "L":
             right = (right - left) / 2 + left
         else:
             left = (right - left + 1) / 2 + left
@@ -31,11 +18,10 @@ def getcol(bsp):
 
 def main():
     with open(sys.argv[1]) as f:
-        all_seats = [getrow(bp[0:7]) * 8 + getcol(bp[7:10]) for bp in f]
-        all_seats = sorted(all_seats)
+        all_seats = sorted(narrow(bp[0:7], 127) * 8 + narrow(bp[7:10], 7) for bp in f)
         low = all_seats[0]
         for s in all_seats:
-            if low != s:
+            if low != s:  # mind the gap
                 return low
             low += 1
 
