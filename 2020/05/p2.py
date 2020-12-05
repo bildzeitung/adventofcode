@@ -6,8 +6,8 @@ import sys
 
 
 def id(bsp):
-    return int(bsp[0:7].replace("F", "0").replace("B", "1") + "000", 2) + int(
-        bsp[7:10].replace("L", "0").replace("R", "1"), 2
+    return int(
+        bsp.replace("F", "0").replace("B", "1").replace("L", "0").replace("R", "1"), 2
     )
 
 

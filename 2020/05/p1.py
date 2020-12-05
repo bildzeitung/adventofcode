@@ -8,10 +8,10 @@ import sys
 def id(bsp):
     """ Calculate the ID
         - convert the strings to 1's and 0's; let Python convert to int
-        - the "000" is a left-shift by 2^3, or 8
+        - alternately: re.sub("F|L", "0", re.sub("B|R", "1", bsp))
     """
-    return int(bsp[0:7].replace("F", "0").replace("B", "1") + "000", 2) + int(
-        bsp[7:10].replace("L", "0").replace("R", "1"), 2
+    return int(
+        bsp.replace("F", "0").replace("B", "1").replace("L", "0").replace("R", "1"), 2
     )
 
 
