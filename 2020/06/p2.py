@@ -3,27 +3,18 @@
   Advent 6
 """
 import sys
-from functools import reduce
-
-
-def common(g):
-    """ Group is a list of sets; find the intersection of all of them
-    """
-    return len(reduce(lambda x, y: x & set(y), g[1:], set(g[0])))
 
 
 def read_group(f):
-    g = []
+    g = set(f.readline().strip())
     while l := f.readline():
         l = l.strip()
         if not l:  # blank line separating passports
-            yield common(g)
-            g = []
+            yield len(g)
+            g = set(f.readline().strip())
             continue
-        g.append(l)
-    yield common(g)
-
-
+        g &= set(l)
+    yield len(g)
 
 
 def main():
