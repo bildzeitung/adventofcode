@@ -19,11 +19,9 @@ def main():
     while turn < 30000000:  # part 2
         if last_spoken not in last_seen:
             spoken = 0
-            last_seen[last_spoken] = turn
         else:
-            # print(f"Last seen {last_spoken}: {last_seen[last_spoken]}")
             spoken = turn - last_seen[last_spoken]
-            last_seen[last_spoken] = turn
+        last_seen[last_spoken] = turn
         # print(f"Turn,{turn+1},spoke,{spoken}")
         turn += 1
         last_spoken = spoken
