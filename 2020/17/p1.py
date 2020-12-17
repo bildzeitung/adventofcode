@@ -23,20 +23,20 @@ def counter(t, puzzle):
 
 
 def tick(puzzle):
-    new = []
+    new = set()
     surrounds = set()
     # eval the active cells
     for t in puzzle:
         count, around = counter(t, puzzle)
         if count == 2 or count == 3:  # keep it; anything else will drop out
-            new.append(t)
+            new.add(t)
         surrounds |= around
 
     # eval the margin
     for s in surrounds:
         count, _ = counter(s, puzzle)
         if count == 3:
-            new.append(s)
+            new.add(s)
 
     return new
 
@@ -68,6 +68,7 @@ def main():
             puzzle.extend((i, y, 0) for i, l in enumerate(line.strip()) if l == "#")
             y += 1
 
+    puzzle = set(puzzle)
     print(vis(puzzle))
     t = 0
     while t < 6:
