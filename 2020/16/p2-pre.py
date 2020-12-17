@@ -15,10 +15,10 @@ def main():
         while r := f.readline().strip():
             label, rs = r.split(":")
             rs = [
-                [int(z) for z in y]
+                f"({y[0]} <= x <= {y[1]})"
                 for y in [x.strip().split("-") for x in rs.split("or")]
             ]
-            rules[label] = rs
+            rules[label] = eval(f'lambda x: {" or ".join(rs)}')
             print(r)
 
         # skip read me
@@ -37,11 +37,7 @@ def main():
     bad_tickets = []
     for ticket in nearby:
         bad = [
-            item
-            for item in ticket
-            if not any(
-                any(x[0] <= item <= x[1] for x in rule) for rule in rules.values()
-            )
+            item for item in ticket if not any(rule(item) for rule in rules.values())
         ]
         if not bad:
             print(",".join([str(x) for x in ticket]))
