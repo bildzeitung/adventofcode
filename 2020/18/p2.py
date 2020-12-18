@@ -29,7 +29,7 @@ def postfixer(f):
 
         if t.type in (NEWLINE, ENDMARKER):
             for o in reversed(opstack):
-              yield o
+                yield o
             return
 
 
