@@ -1,6 +1,15 @@
 #!/usr/bin/env python
 """
   Day 18
+
+  The general steps here are:
+    - tokenize the string
+    - read the tokens and re-write the infix expression into a postfix one
+    - evaluate the postfix expression
+
+  In order to avoid an 'if' on the expression evaluation, use eval(); this is
+  a super heavyweight way to do it, but lol.
+
 """
 import sys
 from io import BytesIO
@@ -8,6 +17,8 @@ from tokenize import tokenize, NEWLINE, OP, NUMBER, ENDMARKER
 
 
 def postfixer(f):
+    """ Convert line of tokens into a postfix expression
+    """
     opstack = []
     for t in tokenize(f.readline):
         if t.type == OP:
@@ -34,6 +45,8 @@ def postfixer(f):
 
 
 def solve(p):
+    """ Evaluate a postfix expression
+    """
     operands = []
     for i in p:
         if i in ("*", "+"):
@@ -46,9 +59,7 @@ def solve(p):
 
 def main():
     with open(sys.argv[1], "rb") as f:
-        s = [solve(postfixer(BytesIO(line))) for line in f]
-        print(s)
-        return sum(s)
+        return sum(solve(postfixer(BytesIO(line))) for line in f)
 
 
 if __name__ == "__main__":
