@@ -9,13 +9,12 @@ from tokenize import tokenize, NEWLINE, OP, NUMBER, ENDMARKER
 
 def postfixer(f):
     opstack = []
-    emitted = []
     for t in tokenize(f.readline):
         if t.type == OP:
             if t.string in ("*", "+"):
                 # both ( and * have lower precedence, so emit any +'s
                 while opstack and opstack[-1] == "+":
-                    emitted.append(opstack.pop())
+                    yield opstack.pop()
                 opstack.append(t.string)
             if t.string == "(":
                 opstack.append(t.string)
@@ -24,14 +23,14 @@ def postfixer(f):
                     arg = opstack.pop()
                     if arg == "(":
                         break
-                    emitted.append(arg)
+                    yield arg
         if t.type == NUMBER:
-            emitted.append(t.string)
+            yield t.string
 
         if t.type in (NEWLINE, ENDMARKER):
-            emitted.extend(reversed(opstack))
-            print(emitted)
-            return emitted
+            for o in reversed(opstack):
+              yield o
+            return
 
 
 def solve(p):
