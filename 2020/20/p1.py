@@ -1,6 +1,10 @@
 #!/usr/bin/env python
 """
   Day 20
+
+  Makes a bunch of assumptions that turn out to be right, so ok :)
+
+  Still kind of a terrible solution.
 """
 import math
 import sys
@@ -48,6 +52,12 @@ def main():
         # print(tiles)
 
     def finder(tile, edge):
+        """ figure out if a specific edge is in the catalog for a tile other
+            than the one given. i.e. who do you match with?
+
+            fortunately, the data is such that this is either none (a border)
+            or exactly one other tile matches
+        """
         rv = set(
             chain.from_iterable([x for x in catalog[e] if x != tile] for e in edge)
         )
@@ -55,7 +65,12 @@ def main():
         return rv.pop() if rv else None
 
     #
-    # ok, examine tile 2311
+    # ok, examine all tiles, find edge mates, and use the # of mates to
+    # discern position in the final layout.
+    #
+    # A B C  e.g. tile A has B, D or 2 mates, so it's a corner
+    # D E F       All edge or middle have > 2 mates, so we know which
+    # G H I       IDs to keep & multiply together
     #
     return math.prod(
         i
@@ -72,7 +87,7 @@ def main():
                 if x
             ]
         )
-        == 2
+        == 2  # a corner piece
     )
 
 
