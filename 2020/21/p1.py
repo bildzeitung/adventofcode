@@ -42,6 +42,7 @@ def main():
         del rbya[allergen]
         assignments[ingredient] = allergen
 
+    # grab the sum from the master count, cause of dupes
     return sum(v for i, v in all_ingredients.items() if i not in assignments)
 
 

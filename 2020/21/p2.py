@@ -9,8 +9,10 @@ from functools import reduce
 
 def main():
     rbya = defaultdict(list)
-    all_ingredients = defaultdict(int)
     with open(sys.argv[1]) as f:
+        # the data structure for this is:
+        #   <allergen> -> list of ingredient sets
+        #
         for line in f:
             ingredients, allergens = [
                 x.strip()
@@ -20,10 +22,10 @@ def main():
             allergens = [x.strip() for x in allergens.split(",")]
             for a in allergens:
                 rbya[a].append(ingredients)
-            for x in ingredients:
-                all_ingredients[x] += 1
 
     def grab():
+        # go through all the allergens and see if a set intersection
+        # of all the food ingredients yields a single assignment
         for a, i in rbya.items():
             # print(f"{a} -> {i}")
             incommon = reduce(lambda x, y: x & y, i)
