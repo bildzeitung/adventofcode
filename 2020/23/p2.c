@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+// Circular single link list
 typedef struct _clist {
   int cup;
   struct _clist* next;
@@ -43,8 +44,16 @@ clist* tick(clist* current, clist* cups, plist* index) {
   // remove it
   current->next = select_end->next;
 
+  /* This is the main problem -- how to grab the destination cup.
+     So what I did was use an index as a non-memory efficient hash table.
+
+     Allocate an array to hold a pointer to each cup. Now there's no
+     longer a linear search required to find the destination -- it's O(1),
+     and now 1 million iterations finishes in no time.
+  */
   int dest = current->cup - 1;
   if (dest == 0) dest = CUPNUM;
+  // no loop -- just check each of the 3 in the sublist
   while ((dest == select_start->cup) ||
     (dest == select_start->next->cup) ||
     (dest == select_end->cup)) {
