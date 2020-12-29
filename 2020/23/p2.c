@@ -15,28 +15,7 @@ const int CUPNUM = 1000000;
 const int MOVES = 10000000;
 
 
-void print_cups(int moves, clist* current, clist* cups) {
-  printf("-- move %i --\n", moves);
-
-  clist* i = cups->next;
-  if (&cups[0] == current) {
-    printf("(%i)", cups[0].cup);
-  } else {
-    printf("%i", cups[0].cup);
-  }
-  while (i != &cups[0]) {
-    if (i == current) {
-      printf(" (%i)", i->cup);
-    } else {
-      printf(" %i", i->cup);
-    }
-    i = i->next;
-  }
-  printf("\n");
-}
-
-
-clist* tick(clist* current, clist* cups, plist* index) {
+clist* tick(clist* current, clist* cups) {
     // grab the sub-list
   clist* select_start = current->next ;
   clist* select_end = current->next->next->next;
@@ -45,22 +24,26 @@ clist* tick(clist* current, clist* cups, plist* index) {
   current->next = select_end->next;
 
   /* This is the main problem -- how to grab the destination cup.
-     So what I did was use an index as a non-memory efficient hash table.
 
-     Allocate an array to hold a pointer to each cup. Now there's no
-     longer a linear search required to find the destination -- it's O(1),
-     and now 1 million iterations finishes in no time.
+     In a typical linked-list, the nodes are not necessarily allocated in
+     a contiguous block of memory. In this case, we know how many nodes we
+     need, so we make them all up front. This means we know where each numbered
+     cup is -- it's offset from the start of the array. This means we have an
+     index into all of the cups and can look one up in the array instead, an
+     O(1) operation.
+
+     We're using the array to act as an index or hash table while storing
+     forward pointers in the circular list. This maintains the game, but lets
+     us avoid having to search for the destination cup.
   */
   int dest = current->cup - 1;
   if (dest == 0) dest = CUPNUM;
   // no loop -- just check each of the 3 in the sublist
   while ((dest == select_start->cup) ||
     (dest == select_start->next->cup) ||
-    (dest == select_end->cup)) {
-      dest -= 1;
-      if (dest == 0) dest = CUPNUM; // sigh; data
-  }
-  clist* destcup = index[dest];
+    (dest == select_end->cup))
+      if (--dest == 0) dest = CUPNUM; // sigh; data
+  clist* destcup = cups + dest;
   select_end->next  = destcup->next;
   destcup->next = select_start;
 
@@ -68,58 +51,37 @@ clist* tick(clist* current, clist* cups, plist* index) {
 }
 
 
-void print_final(clist* current, clist* cups) {
-  while (current->cup != 1) {
-    current = current->next;
-  }
-  printf("--> ");
-  current = current->next;
-  while (current->cup != 1) {
-    printf("%i", current->cup);
-    current = current->next;
-  }
-  printf("\n");
-}
-
 int main() {
   int initial_cups[] = {3,8,9,1,2,5,4,6,7};  // test data
   //int initial_cups[] = {6,1,4,7,5,2,8,3,9};  // my input
   clist *cups = (clist*)malloc(sizeof(clist) * (CUPNUM+1+1));
-  plist *index = malloc(sizeof(plist)*(CUPNUM+1+1));
 
-  // create the index
-  for (int i=0 ; i < (CUPNUM+1); i++) {
-    index[i+1] = cups + i;
+  // initialise the links for the initial set of cups
+  for (int i=0; i < sizeof(initial_cups) / sizeof(int); i++) {
+    cups[initial_cups[i]].next = cups + initial_cups[i+1];
+    cups[initial_cups[i]].cup = initial_cups[i];
   }
-
-  /** Given set of initial cup values, initialise the linked list
-   */
-  for (int i=0; i < CUPNUM; i++) {
-    cups[i].cup = i+1;
+  // link the initial set to the remaining nearly 1 million cups
+  cups[initial_cups[sizeof(initial_cups) / sizeof(int)-1]].next = cups + 10;
+  // create the links for all remaining cups in sequence
+  for (int i=10; i < CUPNUM+1; i++) {
+    cups[i].cup = i;
     cups[i].next = cups + i + 1;
   }
-  // sort out the initial set
-  for (int i=0; i < 9; i++) {
-    cups[i].cup = initial_cups[i];
-    index[cups[i].cup] = cups + i;
-  }
 
-  // fix up the last one
-  cups[CUPNUM-1].next = cups;
+  // create the circular part of the list
+  cups[CUPNUM].next = cups + initial_cups[0];
 
-  // okey doke; now move'em
-  clist* current = cups;
+  // first current cup is the first in the initial set
+  clist* current = cups + initial_cups[0];
 
-  for (int moves = 1; moves < MOVES+1; moves++) {
-    //print_cups(moves, current, cups);
-    current = tick(current, cups, index);
-    //printf("\n");
-  }
+  // core game loop
+  for (int moves = 1; moves < MOVES+1; moves++)
+    current = tick(current, cups);
+
   printf("-- final --\n");
-  //print_cups(current, cups);
-  long long out = (long long)index[1]->next->cup * (long long)index[1]->next->next->cup;
-  printf("Final cups -> %i %i %lld\n", index[1]->next->cup, index[1]->next->next->cup, out);
-  //print_final(current, cups);
+  long long out = (long long)cups[1].next->cup * (long long)cups[1].next->next->cup;
+  printf("Final cups -> %i %i %lld\n", cups[1].next->cup, cups[1].next->next->cup, out);
 
   return 0;
 }
