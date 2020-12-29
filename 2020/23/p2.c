@@ -7,15 +7,17 @@
 typedef struct _clist {
   int cup;
   struct _clist* next;
-  struct _clist* prev;
 } clist;
 typedef clist* plist;
 
 const int CUPNUM = 1000000;
 const int MOVES = 10000000;
 
-void print_cups(clist* current, clist* cups) {
-  clist* i = cups[0].next;
+
+void print_cups(int moves, clist* current, clist* cups) {
+  printf("-- move %i --\n", moves);
+
+  clist* i = cups->next;
   if (&cups[0] == current) {
     printf("(%i)", cups[0].cup);
   } else {
@@ -40,7 +42,6 @@ clist* tick(clist* current, clist* cups, plist* index) {
 
   // remove it
   current->next = select_end->next;
-  select_end->next->prev = current;
 
   int dest = current->cup - 1;
   if (dest == 0) dest = CUPNUM;
@@ -52,9 +53,7 @@ clist* tick(clist* current, clist* cups, plist* index) {
   }
   clist* destcup = index[dest];
   select_end->next  = destcup->next;
-  destcup->next->prev = select_end;
   destcup->next = select_start;
-  select_start->prev = destcup;
 
   return current->next;
 }
@@ -74,8 +73,8 @@ void print_final(clist* current, clist* cups) {
 }
 
 int main() {
-  //int initial_cups[] = {3,8,9,1,2,5,4,6,7};  // test data
-  int initial_cups[] = {6,1,4,7,5,2,8,3,9};  // my input
+  int initial_cups[] = {3,8,9,1,2,5,4,6,7};  // test data
+  //int initial_cups[] = {6,1,4,7,5,2,8,3,9};  // my input
   clist *cups = (clist*)malloc(sizeof(clist) * (CUPNUM+1+1));
   plist *index = malloc(sizeof(plist)*(CUPNUM+1+1));
 
@@ -88,26 +87,22 @@ int main() {
    */
   for (int i=0; i < CUPNUM; i++) {
     cups[i].cup = i+1;
-    cups[i].next = &cups[i+1];
-    cups[i+1].prev = &cups[i];
+    cups[i].next = cups + i + 1;
   }
   // sort out the initial set
   for (int i=0; i < 9; i++) {
     cups[i].cup = initial_cups[i];
-    index[cups[i].cup] = &cups[i];
+    index[cups[i].cup] = cups + i;
   }
 
   // fix up the last one
   cups[CUPNUM-1].next = cups;
-  // fix up the first one
-  cups->prev= &cups[CUPNUM-1];
 
   // okey doke; now move'em
   clist* current = cups;
 
   for (int moves = 1; moves < MOVES+1; moves++) {
-    //printf("-- move %i --\n", moves);
-    //print_cups(current, cups);
+    //print_cups(moves, current, cups);
     current = tick(current, cups, index);
     //printf("\n");
   }
