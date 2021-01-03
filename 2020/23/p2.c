@@ -54,6 +54,11 @@ clist* tick(clist* current, clist* cups) {
 int main() {
   int initial_cups[] = {3,8,9,1,2,5,4,6,7};  // test data
   //int initial_cups[] = {6,1,4,7,5,2,8,3,9};  // my input
+  
+  // n.b. this can still be static, ie:
+  //   clist cups[CUPNUM+1+1];
+  //      if you're willing to, like: ulimit -s <16000032>
+  //
   clist *cups = (clist*)malloc(sizeof(clist) * (CUPNUM+1+1));
 
   // initialise the links for the initial set of cups
