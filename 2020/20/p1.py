@@ -5,6 +5,10 @@
   Makes a bunch of assumptions that turn out to be right, so ok :)
 
   Still kind of a terrible solution.
+
+  Lovely part about this is that we don't have to assemble the tiles at all,
+  so we're not composing what the entire map looks like. So that's cool,
+  except we actually have to solve that for part 2, so this is an own-goal.
 """
 import math
 import sys
