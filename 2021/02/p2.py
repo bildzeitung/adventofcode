@@ -5,11 +5,6 @@
 from pathlib import Path
 import sys
 
-DIRECTIONS = {
-    "forward": (1, 0),
-    "down": (0, 1),
-    "up": (0, -1),
-}
 
 def main():
     horiz = 0
@@ -31,4 +26,4 @@ def main():
 
 
 if __name__ == "__main__":
-    print(main())
+    main()
