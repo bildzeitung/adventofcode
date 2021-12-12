@@ -14,7 +14,14 @@ def main():
             _, output = line.strip().split("|")
             # need length for 1, 4, 7, and 8
             # .. which are (2, 4, 3, 7) ...
-            items = len([*filter(lambda x: x in LENGTHS, (len(x) for x in output.strip().split(" ")))])
+            items = len(
+                [
+                    *filter(
+                        lambda x: x in LENGTHS,
+                        (len(x) for x in output.strip().split(" ")),
+                    )
+                ]
+            )
             results.append(items)
     print(sum(results))
 
