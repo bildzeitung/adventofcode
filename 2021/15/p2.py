@@ -6,6 +6,7 @@ import heapq
 import sys
 from pathlib import Path
 from typing import List
+
 from attrs import define, field
 from rich import print
 
@@ -28,7 +29,7 @@ def solve(puzzle, mx, my):
 
     openSetTracker = set()
     openSetTracker.add(start.point)
-    openSet : List[Node] = []
+    openSet: List[Node] = []
     heapq.heappush(openSet, start)
     allnodes = {start.point: start}
 
@@ -58,12 +59,22 @@ def solve(puzzle, mx, my):
 
             tentative_gScore = current.gscore + puzzle[p]
             if p not in allnodes:
-                np = Node(p, parent=current, gscore=tentative_gScore, fscore=tentative_gScore+h(p))
+                np = Node(
+                    p,
+                    parent=current,
+                    gscore=tentative_gScore,
+                    fscore=tentative_gScore + h(p),
+                )
                 openSetTracker.add(p)
                 heapq.heappush(openSet, np)
                 allnodes[p] = np
             elif tentative_gScore < allnodes[p].gscore:
-                np = Node(p, parent=current, gscore=tentative_gScore, fscore=tentative_gScore+h(p))
+                np = Node(
+                    p,
+                    parent=current,
+                    gscore=tentative_gScore,
+                    fscore=tentative_gScore + h(p),
+                )
                 old_np = allnodes[p]
                 old_np.active = False  # do this instead of re-heaping
                 openSetTracker.add(p)
@@ -81,17 +92,19 @@ def main():
             for x, v in enumerate(line.strip()):
                 iv = int(v)
                 puzzle[(x, y)] = iv
-                for i in range(1,5):
-                    puzzle[(x+(len(line.strip())*i), y)] = ((iv + i) // 10) + ((iv+i) % 10)
+                for i in range(1, 5):
+                    puzzle[(x + (len(line.strip()) * i), y)] = ((iv + i) // 10) + (
+                        (iv + i) % 10
+                    )
             y += 1
     mx = max(x[0] for x in puzzle)
     my = max(x[1] for x in puzzle)
 
-    for y in range(my+1):
+    for y in range(my + 1):
         for i in range(1, 5):
-            for x in range(mx+1):
-                iv = puzzle[(x,y)]
-                puzzle[(x, y + ((my+1)*i))] = ((iv + i) // 10) + ((iv+i) % 10)
+            for x in range(mx + 1):
+                iv = puzzle[(x, y)]
+                puzzle[(x, y + ((my + 1) * i))] = ((iv + i) // 10) + ((iv + i) % 10)
     my = max(x[1] for x in puzzle)
     solve(puzzle, mx, my)
 
