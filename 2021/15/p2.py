@@ -5,8 +5,9 @@
 import heapq
 import sys
 from pathlib import Path
-
+from typing import List
 from attrs import define, field
+from rich import print
 
 
 @define(order=True)
@@ -15,6 +16,7 @@ class Node:
     parent = field(default=None, eq=False)
     fscore = field(default=None)
     gscore = field(default=None, eq=False)
+    active = field(default=True, eq=False)
 
 
 def solve(puzzle, mx, my):
@@ -22,23 +24,25 @@ def solve(puzzle, mx, my):
     def h(p):  # Manhattan distance
         return mx + my - sum(p)
 
+    start = Node((0, 0), gscore=0, fscore=h((0, 0)))
+
     openSetTracker = set()
-    openSet = []
-    start = Node((0, 0))
-    start.fscore = h(start.point)
-    start.gscore = 0
-    heapq.heappush(openSet, start)
     openSetTracker.add(start.point)
+    openSet : List[Node] = []
+    heapq.heappush(openSet, start)
     allnodes = {start.point: start}
 
     END = (mx, my)
     while openSet:
-        current: Node
         current = heapq.heappop(openSet)
+        if not current.active:
+            continue  # ignore inactive
+
         if current.point == END:
-            print(f"Solution: {current}")
+            print(f"Solution: {current.gscore}")
             return
 
+        # XXX THIS IS POTENTIALLY SLOW XXX
         openSetTracker.remove(current.point)
 
         # check around
@@ -53,14 +57,18 @@ def solve(puzzle, mx, my):
                 continue
 
             tentative_gScore = current.gscore + puzzle[p]
-            if p not in allnodes or tentative_gScore < allnodes[p].gscore:
-                np = Node(p)
-                np.parent = current
-                np.gscore = tentative_gScore
-                np.fscore = tentative_gScore + h(p)
-                if p not in openSetTracker:
-                    openSetTracker.add(p)
-                    heapq.heappush(openSet, np)
+            if p not in allnodes:
+                np = Node(p, parent=current, gscore=tentative_gScore, fscore=tentative_gScore+h(p))
+                openSetTracker.add(p)
+                heapq.heappush(openSet, np)
+                allnodes[p] = np
+            elif tentative_gScore < allnodes[p].gscore:
+                np = Node(p, parent=current, gscore=tentative_gScore, fscore=tentative_gScore+h(p))
+                old_np = allnodes[p]
+                old_np.active = False  # do this instead of re-heaping
+                openSetTracker.add(p)
+                heapq.heappush(openSet, np)
+                allnodes[p] = np
 
     assert False, "no solution"
 
@@ -71,9 +79,19 @@ def main():
         y = 0
         for line in f:
             for x, v in enumerate(line.strip()):
-                puzzle[(x, y)] = int(v)
+                iv = int(v)
+                puzzle[(x, y)] = iv
+                for i in range(1,5):
+                    puzzle[(x+(len(line.strip())*i), y)] = ((iv + i) // 10) + ((iv+i) % 10)
             y += 1
     mx = max(x[0] for x in puzzle)
+    my = max(x[1] for x in puzzle)
+
+    for y in range(my+1):
+        for i in range(1, 5):
+            for x in range(mx+1):
+                iv = puzzle[(x,y)]
+                puzzle[(x, y + ((my+1)*i))] = ((iv + i) // 10) + ((iv+i) % 10)
     my = max(x[1] for x in puzzle)
     solve(puzzle, mx, my)
 
