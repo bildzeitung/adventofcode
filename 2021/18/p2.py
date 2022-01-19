@@ -5,10 +5,12 @@
 import sys
 from pathlib import Path
 from rich import print
+from itertools import combinations
+from copy import deepcopy
 
 
 def add(a, b):
-    return [a, b]
+    return [deepcopy(a), deepcopy(b)]
 
 
 def snail_reduce(a):
@@ -80,7 +82,6 @@ def snail_reduce(a):
         if isinstance(b[0], list):
             rv = sp(b[0])
         elif b[0] > 9:
-            #print(f"[L] Got a split: {b}")
             b[0] = [b[0] // 2, b[0] // 2 + b[0] % 2]
             return True
 
@@ -90,7 +91,6 @@ def snail_reduce(a):
         if isinstance(b[1], list):
             rv = sp(b[1])
         elif b[1] > 9:
-            #print(f"[R] Got a split: {b}")
             b[1] = [b[1] // 2, b[1] // 2 + b[1] % 2]
             return True
 
@@ -98,17 +98,14 @@ def snail_reduce(a):
 
     did_a_thing = True
     while did_a_thing:
-        #print("Begin explode pass..")
         did_a_thing, *_ = es(a, 0)
         if did_a_thing:
-            #print(f"Finished: {a}")
             continue
-        #print("Begin split pass..")
         did_a_thing = sp(a)
+    return a
 
 
 def magnitude(a) -> int:
-    t = 0
     if isinstance(a[0], list):
         t = 3 * magnitude(a[0])
     else:
@@ -140,13 +137,16 @@ def to_snailfish(a: str):
 
 def main():
     with Path(sys.argv[1]).open() as f:
-        first = to_snailfish(next(f))
-        for line in f:
-            first = add(first, to_snailfish(line))
-            snail_reduce(first)
-            print(f"Now: {first}")
-    return magnitude(first)
+        snails = [to_snailfish(x) for x in f]
+    r = []
+    for x, y in combinations(snails, 2):
+        print(f"{x} | {y}")
+        r.append(
+            max(magnitude(snail_reduce(add(x, y))),
+            magnitude(snail_reduce(add(y, x)))
+            ))
+    return max(r)
 
 
 if __name__ == "__main__":
-    print(f"Magnitude: {main()}")
+    print(f"Max: {main()}")
