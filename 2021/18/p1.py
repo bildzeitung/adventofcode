@@ -4,6 +4,7 @@
 """
 import sys
 from pathlib import Path
+
 from rich import print
 
 
@@ -17,7 +18,7 @@ def snail_reduce(a):
     def es(b, depth):
         # left needs explode
         if depth == 3 and isinstance(b[0], list):
-            #print(f"Need to explode left: {b} to place: {b[0][0]}")
+            # print(f"Need to explode left: {b} to place: {b[0][0]}")
             to_place = b[0][0]
             if isinstance(b[1], int):
                 b[1] += b[0][1]
@@ -27,23 +28,23 @@ def snail_reduce(a):
                     z = z[0]
                 z[0] += b[0][1]
             b[0] = 0
-            #print(f"[L]: {b}")
+            # print(f"[L]: {b}")
             return True, to_place, None
 
         # right needs explode
         if depth == 3 and isinstance(b[1], list):
-            #print(f"Need to explode right: {b} to place: {b[1][1]}")
+            # print(f"Need to explode right: {b} to place: {b[1][1]}")
             to_place = b[1][1]
             if isinstance(b[0], int):
                 b[0] += b[1][0]
                 b[1] = 0
-            #print(f"[R]: {b}")
+            # print(f"[R]: {b}")
             return True, None, to_place
 
         exploded, l, r = False, None, None
         if isinstance(b[0], list):  # left tree
             exploded, l, r = es(b[0], depth + 1)
-            #print(f"Back from left: {exploded}, {l}, {r}")
+            # print(f"Back from left: {exploded}, {l}, {r}")
             if exploded:
                 if r:
                     if isinstance(b[1], int):
@@ -52,14 +53,14 @@ def snail_reduce(a):
                     z = b[1]
                     while not isinstance(z[0], int):
                         z = z[0]
-                    #print(f"Found: {z}")
+                    # print(f"Found: {z}")
                     z[0] += r
                     return True, None, None
                 return exploded, l, r
 
-        if isinstance(b[1], list):  # right tree        
+        if isinstance(b[1], list):  # right tree
             exploded, l, r = es(b[1], depth + 1)
-            #print(f"Back from right: {exploded}, {l}, {r}")
+            # print(f"Back from right: {exploded}, {l}, {r}")
             if exploded:
                 if l:
                     if isinstance(b[0], int):
@@ -80,7 +81,7 @@ def snail_reduce(a):
         if isinstance(b[0], list):
             rv = sp(b[0])
         elif b[0] > 9:
-            #print(f"[L] Got a split: {b}")
+            # print(f"[L] Got a split: {b}")
             b[0] = [b[0] // 2, b[0] // 2 + b[0] % 2]
             return True
 
@@ -90,7 +91,7 @@ def snail_reduce(a):
         if isinstance(b[1], list):
             rv = sp(b[1])
         elif b[1] > 9:
-            #print(f"[R] Got a split: {b}")
+            # print(f"[R] Got a split: {b}")
             b[1] = [b[1] // 2, b[1] // 2 + b[1] % 2]
             return True
 
@@ -98,12 +99,12 @@ def snail_reduce(a):
 
     did_a_thing = True
     while did_a_thing:
-        #print("Begin explode pass..")
+        # print("Begin explode pass..")
         did_a_thing, *_ = es(a, 0)
         if did_a_thing:
-            #print(f"Finished: {a}")
+            # print(f"Finished: {a}")
             continue
-        #print("Begin split pass..")
+        # print("Begin split pass..")
         did_a_thing = sp(a)
 
 
@@ -118,16 +119,16 @@ def magnitude(a) -> int:
         t += 2 * magnitude(a[1])
     else:
         t += 2 * a[1]
-    
+
     return t
 
 
 def to_snailfish(a: str):
     stack = []
     for x in a.strip():
-        if x in ('[', ','):
+        if x in ("[", ","):
             continue
-        if x == ']':
+        if x == "]":
             right = stack.pop()
             left = stack.pop()
             stack.append([left, right])
