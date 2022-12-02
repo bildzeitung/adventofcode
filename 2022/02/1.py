@@ -5,29 +5,13 @@
 import sys
 from pathlib import Path
 
-opponent = {
-    "A" : "rock",
-    "B" : "paper",
-    "C" : "scissors"
-}
+opponent = {"A": "rock", "B": "paper", "C": "scissors"}
 
-strategy = {
-    "X" : "rock",
-    "Y" : "paper",
-    "Z" : "scissors"
-}
+strategy = {"X": "rock", "Y": "paper", "Z": "scissors"}
 
-winners = (
-    ("rock", "paper"),
-    ("paper", "scissors"),
-    ("scissors", "rock")
-)
+winners = (("rock", "paper"), ("paper", "scissors"), ("scissors", "rock"))
 
-score = {
-    "rock": 1,
-    "paper": 2,
-    "scissors": 3
-}
+score = {"rock": 1, "paper": 2, "scissors": 3}
 
 
 def main():
