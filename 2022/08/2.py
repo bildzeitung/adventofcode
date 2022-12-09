@@ -42,11 +42,13 @@ def main():
 
         return tl * tr * tu * td
 
-    all_views = []
+    max_view = -1
     for y in range(1, ly - 1):
         for x in range(1, lx - 1):
-            all_views.append(check(y, x))
-    print(f"Max: {max(all_views)}")
+            c = check(y, x)
+            if c > max_view:
+                max_view = c
+    print(f"Max: {max_view}")
 
 
 if __name__ == "__main__":
