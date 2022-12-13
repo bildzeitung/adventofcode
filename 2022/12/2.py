@@ -24,7 +24,7 @@ def main():
                     puzzle[y][x] = "z"
                 phash[(x, y)] = ord(puzzle[y][x]) - ord("a")
 
-    def delta(pt):
+    def delta(pt):  # Manhattan distance
         return abs(goal[0] - pt[0]) + abs(goal[1] - pt[1])
 
     seen = {start: 0}
@@ -47,7 +47,12 @@ def main():
             if phash[dest] > phash[coord] + 1:
                 return
 
-            new_seen = seen[coord] + 1
+            # 'a' is a start point, so score it like it's the start
+            if phash[coord] == 0:
+                new_seen = 1
+            else:
+                new_seen = seen[coord] + 1
+
             if dest not in seen or new_seen < seen[dest]:
                 seen[dest] = new_seen
                 priority = new_seen + delta(dest)
