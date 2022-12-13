@@ -13,13 +13,13 @@ from math import prod
 
 @define
 class Monkey:
-    items : list
-    operation : str
+    items: list
+    operation: str
     rightop: Any
     divby: int
     true_throw: int
     false_throw: int
-    inspected : int = 0
+    inspected: int = 0
 
     def inspect(self, lcm, monkeys):
         for item in self.items:
@@ -31,7 +31,7 @@ class Monkey:
             else:
                 worry = item * item
             worry = worry % lcm
-            m = worry % self.divby 
+            m = worry % self.divby
             if m:
                 monkeys[self.false_throw].items.append(worry)
             else:
@@ -39,13 +39,16 @@ class Monkey:
         self.inspected += len(self.items)
         self.items = []
 
+
 def main():
     monkeys = []
     with Path(sys.argv[1]).open() as f:
         while True:
             try:
                 next(f)  # Monkey X
-                items = [int(x.strip()) for x in next(f).strip().split(":")[1].split(",")]
+                items = [
+                    int(x.strip()) for x in next(f).strip().split(":")[1].split(",")
+                ]
                 l, op, r = next(f).split("=")[1].strip().split(" ")  # op
                 if "old" not in r:
                     r = int(r)
@@ -61,7 +64,9 @@ def main():
         for z in range(10_000):
             for i, monkey in enumerate(monkeys):
                 monkey.inspect(lcm, monkeys)
-        print(prod(x.inspected for x in sorted(monkeys, key=lambda x: -x.inspected)[0:2]))
+        print(
+            prod(x.inspected for x in sorted(monkeys, key=lambda x: -x.inspected)[0:2])
+        )
 
 
 if __name__ == "__main__":
