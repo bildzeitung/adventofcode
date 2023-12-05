@@ -28,7 +28,8 @@ def main():
                     (int(m[0]), [(a, row) for a in range(m.start(), m.end())])
                 )
             for m in find_operators.finditer(line):
-                assert m.end() - m.start() == 1
+                if m[0] != "*":  # only need stars (gears) this time
+                    continue
                 symbols.add((m.start(), row))
             puzzle.append(line)
             row += 1
@@ -53,25 +54,38 @@ def main():
 
         return False
 
-    # now that the puzzle is loaded, get to work
+    good_numbers = [x for x in filter(check_number, all_numbers)]
 
-    good_numbers = []
-    good_ints = []
-    for n in all_numbers:
-        if check_number(n):
-            good_numbers.extend(n[1])
-            good_ints.append(n[0])
+    def is_a_near_b(a, b) -> bool:
+        x, y = b[0], b[1]
+        return a in (
+            (x - 1, y),
+            (x + 1, y),
+            (x - 1, y - 1),
+            (x, y - 1),
+            (x + 1, y - 1),
+            (x - 1, y + 1),
+            (x, y + 1),
+            (x + 1, y + 1),
+        )
 
-    for y in range(len(puzzle)):
-        line = ""
-        for x in range(0, len(puzzle[0])):
-            if (x, y) in good_numbers:
-                line += f"[red]{puzzle[y][x]}[/red]"
-            else:
-                line += puzzle[y][x]
-        c.print(line)
-    print(good_ints)
-    return sum(good_ints)
+    def check_gear(n) -> bool:
+        r = []
+        for g in good_numbers:
+            for k in g[1]:
+                if is_a_near_b(n, k):
+                    r.append(g[0])
+                    break
+
+        return r
+
+    sum = 0
+    for gear in symbols:
+        candidate = check_gear(gear)
+        if len(candidate) == 2:
+            sum += candidate[0] * candidate[1]
+
+    return sum
 
 
 if __name__ == "__main__":
