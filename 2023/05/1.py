@@ -31,52 +31,27 @@ def main():
         seeds = [int(x) for x in next(f).split(":")[1].strip().split()]
 
         next(f)  # nop
-        next(f)  # seed to soil
-        while line := next(f).strip():
-            dest, source, span = [int(x) for x in line.strip().split()]
-            seedr.update((source, source + span - 1))
-            soil_map[(source, source + span - 1)] = dest
 
-        next(f)  # soil to fertilizer
-        while line := next(f).strip():
-            dest, source, span = [int(x) for x in line.strip().split()]
-            soilr.update((source, source + span - 1))
-            fertilizer_map[(source, source + span - 1)] = dest
+        def read_group():
+            next(f)
+            src = SortedList()
+            dst = {}
+            while line := next(f).strip():
+                dest, source, span = [int(x) for x in line.strip().split()]
+                src.update((source, source + span - 1))
+                dst[(source, source + span - 1)] = dest
+            return src, dst
 
-        next(f)  # fertilizer to water
-        while line := next(f).strip():
-            dest, source, span = [int(x) for x in line.strip().split()]
-            fertilizer.update((source, source + span - 1))
-            water_map[(source, source + span - 1)] = dest
-
-        next(f)  # water to light
-        while line := next(f).strip():
-            dest, source, span = [int(x) for x in line.strip().split()]
-            water.update((source, source + span - 1))
-            light_map[(source, source + span - 1)] = dest
-
-        next(f)  # light to temperature
-        while line := next(f).strip():
-            dest, source, span = [int(x) for x in line.strip().split()]
-            lightr.update((source, source + span - 1))
-            temp_map[(source, source + span - 1)] = dest
-
-        next(f)  # temperature to humidity
-        while line := next(f).strip():
-            dest, source, span = [int(x) for x in line.strip().split()]
-            tempr.update((source, source + span - 1))
-            humidity_map[(source, source + span - 1)] = dest
-
-        next(f)  # humidity to location
-        while line := next(f).strip():
-            dest, source, span = [int(x) for x in line.strip().split()]
-            humidr.update((source, source + span - 1))
-            location_map[(source, source + span - 1)] = dest
+        seedr, soil_map = read_group()
+        soilr, fertilizer_map = read_group()
+        fertilizer, water_map = read_group()
+        water, light_map = read_group()
+        lightr, temp_map = read_group()
+        tempr, humidity_map = read_group()
+        humidr, location_map = read_group()
 
     def mapr(source: SortedList, dest: dict, value):
-        # print(source, value)
         b = source.bisect_left(value)
-        # print('bisect', b)
 
         # cases:
         #  - before first interval
