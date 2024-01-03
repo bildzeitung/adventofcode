@@ -3,14 +3,15 @@
     Day 11
 """
 import sys
+from itertools import combinations
 from pathlib import Path
 from typing import List
+
 from rich import print
-from itertools import combinations
 
 
 def apsp(galaxies: List[int]) -> int:
-    return (abs(a[0] - b[0]) + abs(a[1] - b[1]) for a,b in combinations(galaxies, 2))
+    return (abs(a[0] - b[0]) + abs(a[1] - b[1]) for a, b in combinations(galaxies, 2))
 
 
 def main():
@@ -19,12 +20,10 @@ def main():
         for line in f:
             puzzle.append([*line.strip()])
 
-    pivot = [
-        [r[i] for r in puzzle] for i in range(len(puzzle[0]))
-    ]
+    pivot = [[r[i] for r in puzzle] for i in range(len(puzzle[0]))]
 
-    empty_rows = [idx for idx, r in enumerate(puzzle) if '#' not in r]
-    empty_cols = [idx for idx, r in enumerate(pivot) if '#' not in r]
+    empty_rows = [idx for idx, r in enumerate(puzzle) if "#" not in r]
+    empty_cols = [idx for idx, r in enumerate(pivot) if "#" not in r]
 
     print(f"Empty rows: {empty_rows}  Empty cols: {empty_cols}")
 
@@ -38,10 +37,11 @@ def main():
         for idx, col in enumerate(rows):
             if idx in empty_cols:
                 x_offset += 1
-            if col == '#':
-                galaxies.append((idx + x_offset,ridx + y_offset))
+            if col == "#":
+                galaxies.append((idx + x_offset, ridx + y_offset))
 
     return sum(x for x in apsp(galaxies))
+
 
 if __name__ == "__main__":
     print(main())
